@@ -74,9 +74,9 @@
 <body>
     <div class="container">
         <h1>Generate PDF with QR Codes</h1>
-        <p style="color: #ff0000">Enter page dimensions, QR code size, and upload an Excel file.</p>
+        <p style="color: #ff0000">Enter page dimensions, QR code size, and row count.</p>
         
-        <form id="qrForm" enctype="multipart/form-data">
+        <form id="qrForm">
             @csrf
             <label for="page_height">Page Height (mm)</label>
             <input type="text" id="page_height" name="page_height" required>
@@ -102,8 +102,8 @@
             <label for="qr_width">QR Code Width (mm)</label>
             <input type="text" id="qr_width" name="qr_width" required>
 
-            <label for="excel_file">Upload Excel File</label>
-            <input type="file" id="excel_file" name="excel_file" accept=".xlsx, .xls" required>
+            <label for="row_number">Number of Rows</label>
+            <input type="number" id="row_number" name="row_number" min="1" required>
 
             <button type="button" onclick="submitForm()">Generate PDF</button>
         </form>

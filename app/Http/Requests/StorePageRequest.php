@@ -31,7 +31,7 @@ class StorePageRequest extends FormRequest
             'margin_right' => 'required|string',
             'qr_height' => 'required|string',
             'qr_width' => 'required|string',
-            'excel_file' => 'required|file|mimes:xlsx,xls',
+            'row_number' => 'required|integer',
         ];
     }
 
@@ -52,8 +52,8 @@ class StorePageRequest extends FormRequest
             'margin_right.required' => 'Margin right is required',
             'qr_height.required' => 'QR height is required',
             'qr_width.required' => 'QR width is required',
-            'excel_file.required' => 'Excel file is required',
-            'excel_file.mimes' => 'Excel file must be of type xlsx or xls',
+            'row_number.required' => 'Row number is required',
+            'row_number.integer' => 'Row number must be an integer',
         ];
     }
 }
