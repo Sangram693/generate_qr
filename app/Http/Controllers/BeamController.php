@@ -109,6 +109,61 @@ class BeamController extends Controller
     /**
  * Bulk update multiple Beam records from an Excel file.
  */
+
+ public function bulkUpload(Request $request)
+ {
+     // Validate if a file is uploaded
+     if (!$request->hasFile('excel_file')) {
+         return response()->json(['message' => 'No file uploaded'], 400);
+     }
+ 
+     // Get uploaded file
+     $file = $request->file('excel_file');
+     $path = $file->getRealPath();
+ 
+     // Load the Excel file
+     $spreadsheet = IOFactory::load($path);
+     $sheet = $spreadsheet->getActiveSheet();
+     $data = $sheet->toArray(null, true, true, true); // Convert to array
+ 
+     // Initialize counters
+     $inserted = 0;
+     $failed = [];
+ 
+     // Loop through each row, starting from row 2 (assuming row 1 is headers)
+     foreach ($data as $index => $row) {
+         if ($index === 1) continue; // Skip headers
+ 
+         try {
+             Beam::create([
+                    'id' => $row['A'],
+                 'name' => $row['B'] ?? null,
+                 'description' => $row['C'] ?? null,
+                 'model_number' => $row['D'] ?? null,
+                 'serial_number' => $row['E'] ?? null,
+                 'batch_number' => $row['F'] ?? null,
+                 'manufacturer' => $row['G'] ?? null,
+                 'beam_type' => $row['H'] ?? null,
+                 'beam_shape' => $row['I'] ?? null,
+                 'beam_length' => $row['J'] ?? null,
+                 'beam_width' => $row['K'] ?? null,
+                 'beam_height' => $row['L'] ?? null,
+                 'beam_weight' => $row['M'] ?? null,
+             ]);
+             $inserted++;
+         } catch (\Exception $e) {
+             $failed[] = "Row {$index}: Failed to insert record - " . $e->getMessage();
+         }
+     }
+ 
+     // Return summary response
+     return response()->json([
+         'message' => 'Bulk upload completed',
+         'inserted' => $inserted,
+         'failed' => $failed,
+     ], 200);
+ }
+
 public function bulkUpdate(UpdateBeamRequest $request)
 {
     // Validate if a file is uploaded

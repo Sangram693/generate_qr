@@ -16,11 +16,12 @@ Route::post('/register', [UserController::class, 'store']);
 
 Route::post('/logout', [UserController::class, 'logout']);
 
-Route::get('w-beam/{id}', [BeamController::class, 'show']);
+Route::get('/w-beam/{id}', [BeamController::class, 'show']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/users', [UserController::class, 'index']);
     Route::get('/user/{user}', [UserController::class, 'show']);
-    Route::apiResource('pages', PageController::class);
-    Route::post('w-beams/bulk-update', [BeamController::class, 'bulkUpdate']);
+    Route::apiResource('/pages', PageController::class);
+    Route::post('/w-beams/bulk-update', [BeamController::class, 'bulkUpdate']);
+    Route::post('/w-beams/bulk-upload', [BeamController::class, 'bulkUpload']);
 });
