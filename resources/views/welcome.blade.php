@@ -102,7 +102,7 @@
             <label for="qr_width">QR Code Width (mm)</label>
             <input type="text" id="qr_width" name="qr_width" required>
 
-            <label for="row_number">Number of Rows</label>
+            <label for="row_number">Number of QR</label>
             <input type="number" id="row_number" name="row_number" min="1" required>
 
             <button type="button" onclick="submitForm()">Generate PDF</button>
@@ -120,7 +120,7 @@
                 method: "POST",
                 body: formData,
                 headers: {
-                    "Authorization": "Bearer 1|VwsGNegFGe2a3x28wZqxGFQmKQrNugbkBEir2uoB93424f79"
+                    "Authorization": "Bearer 1|KkcHQNBce67oFD1Cq6gBvsNAm1uVSZMuPLbd1jdv0feb1691"
                 }
             })
             .then(response => {

@@ -4,6 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Beam;
 use App\Http\Requests\StoreBeamRequest;
+use Illuminate\Http\Request;
+use App\Models\Stat;
+use App\Models\Viewer;
+use Location;
 use App\Http\Requests\UpdateBeamRequest;
 
 class BeamController extends Controller
@@ -35,19 +39,61 @@ class BeamController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show($id)
-    {
+    
 
-        // return $id;
-        $beam = Beam::find($id);
-
-        if (!$beam) {
-            return response()->json(['message' => 'Beam not found'], 404);
-        }
-
-            return view('show_beam', ['beam' => $beam]);
-        
-    }
+     public function show($id, Request $request)
+     {
+         // Find the Beam record
+         $beam = Beam::find($id);
+        //  if (!$beam) {
+        //      return response()->json(['message' => 'Beam not found'], 404);
+        //  }
+     
+         // Get user details
+         $ipAddress = $request->ip(); // Get the user's IP address
+         $userAgent = $request->header('User-Agent');
+         $advertisingId = $request->header('X-Advertising-ID'); // Assuming advertising ID is sent in request header
+     
+         // Get location using `stevebauman/location`
+         $location = Location::get($ipAddress);
+         $city = $location ? $location->cityName : 'Unknown';
+         $country = $location ? $location->countryName : 'Unknown';
+     
+         // Check if user is unique (based on advertising_id or IP address)
+         $uniqueViewer = Viewer::where(function ($query) use ($advertisingId, $ipAddress) {
+                 $query->where('advertising_id', $advertisingId)
+                       ->orWhere('ip_address', $ipAddress);
+             })
+             ->first();
+     
+         if (!$uniqueViewer) {
+             // Insert new unique viewer using Eloquent ORM
+             Viewer::create([
+                 'advertising_id' => $advertisingId,
+                 'ip_address' => $ipAddress,
+                 'user_agent' => $userAgent,
+                 'city' => $city,
+                 'country' => $country,
+                 'first_seen' => now(),
+                 'last_seen' => now(),
+             ]);
+     
+             // Increment unique_hits using Eloquent ORM
+             Stat::firstOrCreate(['id' => 1])->increment('unique_hits');
+         } else {
+             // Update last_seen for returning viewer
+             $uniqueViewer->update([
+                 'last_seen' => now(),
+             ]);
+         }
+     
+         // Increment total_hits using Eloquent ORM
+         Stat::firstOrCreate(['id' => 1])->increment('total_hits');
+     
+         return view('show_beam', ['beam' => $beam]);
+     }
+     
+    
 
     /**
      * Show the form for editing the specified resource.
