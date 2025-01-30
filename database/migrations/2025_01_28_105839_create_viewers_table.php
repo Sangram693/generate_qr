@@ -10,10 +10,10 @@ return new class extends Migration
     {
         Schema::create('viewers', function (Blueprint $table) {
             $table->id();
-            $table->string('product_type'); 
-            $table->string('product_id'); 
-            $table->string('advertising_id')->nullable(); 
-            $table->string('ip_address')->nullable(); 
+            $table->string('product_type', 50); 
+            $table->string('product_id', 50); 
+            $table->string('advertising_id', 100)->nullable(); 
+            $table->string('ip_address', 45)->nullable(); 
             $table->string('user_agent')->nullable(); 
             $table->string('city')->nullable(); 
             $table->string('country')->nullable(); 
