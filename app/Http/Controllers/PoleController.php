@@ -2,15 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Beam;
-use App\Http\Requests\StoreBeamRequest;
+use App\Models\Pole;
 use Illuminate\Http\Request;
-use App\Models\Stat;
-use App\Models\Viewer;
-use Location;
-use App\Http\Requests\UpdateBeamRequest;
 
-class BeamController extends Controller
+class PoleController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -31,7 +26,7 @@ class BeamController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreBeamRequest $request)
+    public function store(Request $request)
     {
         //
     }
@@ -39,26 +34,19 @@ class BeamController extends Controller
     /**
      * Display the specified resource.
      */
-    
+    public function show($id, Request $request)
+    {
+        $pole = Pole::find($id);
+        if (!$pole) {
+            return response()->json(['message' => 'Pole not found'], 404);
+        }
 
-     public function show($id, Request $request)
-     {
-         $beam = Beam::find($id);
+        $this->trackView('pole', $id, $request);
 
-         if (!$beam) {
-             return response()->json(['message' => 'Beam not found'], 404);
-         }
+        return view('show_pole', ['pole' => $pole]);
+    }
 
-         if($beam->status == 0){
-            return response()->json(['message' => 'Beam not active'], 404);
-         }
- 
-         $this->trackView('beam', $id, $request);
- 
-         return view('show_beam', ['beam' => $beam]);
-     }
- 
-     private function trackView($productType, $productId, Request $request)
+    private function trackView($productType, $productId, Request $request)
      {
          $ipAddress = $request->ip();
          $userAgent = $request->header('User-Agent');
@@ -105,13 +93,11 @@ class BeamController extends Controller
              ['total_hits' => 0, 'unique_hits' => 0]
          )->increment('total_hits');
      }
-     
-    
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit($id)
+    public function edit(Pole $pole)
     {
         //
     }
@@ -119,65 +105,15 @@ class BeamController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    /**
- * Bulk update multiple Beam records from an Excel file.
- */
-
- public function bulkUpload(Request $request)
- {
-     // Validate if a file is uploaded
-     if (!$request->hasFile('excel_file')) {
-         return response()->json(['message' => 'No file uploaded'], 400);
-     }
- 
-     // Get uploaded file
-     $file = $request->file('excel_file');
-     $path = $file->getRealPath();
- 
-     // Load the Excel file
-     $spreadsheet = IOFactory::load($path);
-     $sheet = $spreadsheet->getActiveSheet();
-     $data = $sheet->toArray(null, true, true, true); // Convert to array
- 
-     // Initialize counters
-     $inserted = 0;
-     $failed = [];
- 
-     // Loop through each row, starting from row 2 (assuming row 1 is headers)
-     foreach ($data as $index => $row) {
-         if ($index === 1) continue; // Skip headers
- 
-         try {
-             Beam::create([
-                    'id' => $row['A'],
-                    'grade' => $row['B'] ?? null,
-                    'batch_no' => $row['C'] ?? null,
-                    'serial_no' => $row['D'] ?? null,
-             ]);
-             $inserted++;
-         } catch (\Exception $e) {
-             $failed[] = "Row {$index}: Failed to insert record - " . $e->getMessage();
-         }
-     }
- 
-     // Return summary response
-     return response()->json([
-         'message' => 'Bulk upload completed',
-         'inserted' => $inserted,
-         'failed' => $failed,
-     ], 200);
- }
-
-public function bulkUpdate(UpdateBeamRequest $request, Array $ids)
-{
-   
-}
-
+    public function update(Request $request, Pole $pole)
+    {
+        //
+    }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($id)
+    public function destroy(Pole $pole)
     {
         //
     }

@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use TCPDF;
 use App\Models\Beam;
 use App\Models\Page;
+use App\Models\Pole;
+use App\Models\HighMast;
 use Illuminate\Http\Request;
 use App\Http\Requests\StorePageRequest;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -13,12 +15,6 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class PageController extends Controller
 {
-
-    
-    
-    
-    
-
     public function index()
 {
     return Page::query()
@@ -33,6 +29,10 @@ class PageController extends Controller
         $user = auth()->user();
         $request->merge(['user_id' => $user->id]);
 
+        $request->validated([
+            'product_type' => 'required|in:w-beam, pole, high-mast'
+        ]);
+
         
         $rowNumber = $request->row_number;
 
@@ -43,30 +43,40 @@ class PageController extends Controller
 
         
         $sheet->setCellValue('A1', 'id');
-        $sheet->setCellValue('B1', 'model_no');
-        $sheet->setCellValue('C1', 'bach_no');
-        $sheet->setCellValue('D1', 'serial_no');
-        $sheet->setCellValue('E1', 'mfd_origin');
-        $sheet->setCellValue('F1', 'mfd_date');
-        $sheet->setCellValue('G1', 'asp');
-        $sheet->setCellValue('H1', 'status');
-        
 
+        $productModel = match ($request->product_type) {
+            'w-beam' => Beam::class,
+            'pole' => Pole::class,
+            'high-mast' => HighMast::class,
+        };
+
+        $baseUrl = match ($request->product_type) {
+            'w-beam' => 'www.utkarshsmart.in/api/w-beam/',
+            'pole' => 'www.utkarshsmart.in/api/pole/',
+            'high-mast' => 'www.utkarshsmart.in/api/high-mast/',
+        };
+
+        [$r, $g, $b] = match ($request->product_type) {
+            'w-beam' => [56, 182, 255],
+            'pole' => [255, 99, 71],
+            'high-mast' => [34, 139, 34],
+        };
         
         $data = [];
         for ($i = 2; $i <= $rowNumber + 1; $i++) {
             $randomValue = $this->generateRandomString(16);
             $sheet->setCellValue('A' . $i, $randomValue);
-            $beam = new Beam();
-            $beam->id = $randomValue;
-            $beam->save();
-            $data[] = $beam->id;
+            $product = new $productModel();
+            $product->id = $randomValue;
+            $product->save();
+            $data[] = $product->id;
         }
 
         
         $fileName = 'random_values_' . time() . '.xlsx';
         $filePath = 'excel_files/' . $fileName;
         $storagePath = storage_path('app/public/' . $filePath);
+        $excelFile = $filePath;
         $filePath = 'storage/' . $filePath;
 
         
@@ -141,12 +151,12 @@ class PageController extends Controller
         $pdf->SetFillColor(255, 255, 255, 0); 
 $pdf->Rect(0, 0, $page_width, $page_height, 'F');
         
-        foreach ($data as $beamId) {
-            $beam = Beam::find($beamId);
-            if (!$beam) continue;
+        foreach ($data as $productId) {
+            $product = Beam::find($productId);
+            if (!$product) continue;
         
             
-            $qrCodeSvg = QrCode::format('svg')->size($qr_width)->generate("www.utkarshsmart.in/api/w-beam/$beam->id");
+            $qrCodeSvg = QrCode::format('svg')->size($qr_width)->generate($baseUrl.$product->id);
             $tempFile = "{$tempPath}temp_qr_$count.svg";
             file_put_contents($tempFile, $qrCodeSvg);
         
@@ -159,7 +169,7 @@ $pdf->Rect(0, 0, $page_width, $page_height, 'F');
             $pdf->SetFillColor(255, 255, 255); 
     $pdf->Rect($x - 1, $y - 1, $qr_width + 4, $total_border_height + 0.7, 'F');
             
-$pdf->SetDrawColor(56, 182, 255); 
+$pdf->SetDrawColor($r, $g, $b); 
 $pdf->SetLineWidth(1); 
 $logo_height = 8; 
 $padding = 1; 
@@ -172,7 +182,7 @@ $qr_y = $y + $padding;
 $pdf->ImageSVG($tempFile, $qr_x, $qr_y, $qr_width, $qr_height);
 
 $line_y = $qr_y + $qr_height + 2; 
-$pdf->SetDrawColor(56, 182, 255); 
+$pdf->SetDrawColor($r, $g, $b); 
 $pdf->SetLineWidth(0.5); 
 $pdf->Line($x -1, $line_y, $x + $qr_width + 3, $line_y);
 
@@ -204,14 +214,15 @@ $pdf->Rect(0, 0, $page_width, $page_height, 'F');
             unlink($tempFile);
         }
         
-        $pdfPath = storage_path('app/public/beam_qrcodes_' . time() . '.pdf');
+        $pdfPath = storage_path('app/public/beam_qrcodes_' . '.pdf');
         $pdf->Output($pdfPath, 'F');
         
         if (!file_exists($pdfPath)) {
             return response()->json(['error' => 'PDF file not generated'], 500);
         }
-        
+        unlink($excelFile);
         return response()->download($pdfPath);
+        
         
     }
 

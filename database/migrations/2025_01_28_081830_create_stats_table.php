@@ -10,9 +10,13 @@ return new class extends Migration
     {
         Schema::create('stats', function (Blueprint $table) {
             $table->id();
-            $table->integer('total_hits')->default(0); 
-            $table->integer('unique_hits')->default(0); 
+            $table->string('product_type');
+            $table->string('product_id'); 
+            $table->integer('total_hits')->default(0);
+            $table->integer('unique_hits')->default(0);
             $table->timestamps();
+
+            $table->unique(['product_type', 'product_id']);
         });
     }
 

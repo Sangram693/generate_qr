@@ -10,7 +10,9 @@ return new class extends Migration
     {
         Schema::create('viewers', function (Blueprint $table) {
             $table->id();
-            $table->string('advertising_id')->nullable()->unique(); 
+            $table->string('product_type'); 
+            $table->string('product_id'); 
+            $table->string('advertising_id')->nullable(); 
             $table->string('ip_address')->nullable(); 
             $table->string('user_agent')->nullable(); 
             $table->string('city')->nullable(); 
@@ -18,9 +20,8 @@ return new class extends Migration
             $table->timestamp('first_seen')->useCurrent(); 
             $table->timestamp('last_seen')->useCurrent()->useCurrentOnUpdate(); 
             $table->timestamps();
-            
-            
-            $table->unique(['advertising_id', 'ip_address']);
+
+            $table->unique(['product_type', 'product_id', 'advertising_id', 'ip_address']);
         });
     }
 
@@ -29,3 +30,4 @@ return new class extends Migration
         Schema::dropIfExists('viewers');
     }
 };
+

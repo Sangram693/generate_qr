@@ -12,22 +12,8 @@ class Beam extends Model
 
     protected $table = 'beams';
     protected $primaryKey = 'id';
-    public $incrementing = false; // Prevent auto-increment issues
+    public $incrementing = false; 
     protected $keyType = 'string'; 
 
-    protected $fillable = [
-        'id',
-        'name',
-        'description',
-        'model_number',
-        'serial_number',
-        'bach_number',
-        'manufacturer',
-        'beam_type',
-        'beam_shape',
-        'beam_length',
-        'beam_width',
-        'beam_height',
-        'beam_weight',
-    ];
+    protected $guarded = [];
 }

@@ -4,23 +4,23 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BeamController;
 use App\Http\Controllers\PageController;
+use App\Http\Controllers\PoleController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\DealerController;
+use App\Http\Controllers\HighMastController;
 
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum');
+Route::post('/login', [UserController::class, 'login'])->name('login');
+Route::post('/dealer/registrer', [DealerController::class, 'store']);
+Route::post('/dealer/login', [DealerController::class, 'login']);
 
-Route::post('/login', [UserController::class, 'login']);
-
-Route::post('/register', [UserController::class, 'store']);
-
-Route::post('/logout', [UserController::class, 'logout']);
 
 Route::get('/w-beam/{id}', [BeamController::class, 'show']);
+Route::get('/pole/{id}', [PoleController::class, 'show']);
+Route::get('/high-mast/{id}', [HighMastController::class, 'show']);
 
 Route::middleware('auth:sanctum')->group(function () {
-    Route::get('/users', [UserController::class, 'index']);
-    Route::get('/user/{user}', [UserController::class, 'show']);
+    Route::apiResource('/user', UserController::class);
+    Route::get('/logout', [UserController::class, 'logout']);
     Route::apiResource('/pages', PageController::class);
     Route::post('/w-beams/bulk-update', [BeamController::class, 'bulkUpdate']);
     Route::post('/w-beams/bulk-upload', [BeamController::class, 'bulkUpload']);

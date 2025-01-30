@@ -55,7 +55,7 @@
         label {
             font-weight: 600;
         }
-        input, button {
+        input, button, select {
             padding: 10px;
             width: 100%;
             border: 1px solid #ccc;
@@ -74,10 +74,17 @@
 <body>
     <div class="container">
         <h1>Generate PDF with QR Codes</h1>
-        <p style="color: #ff0000">Enter page dimensions, QR code size, and row count.</p>
+        <p style="color: #ff0000">Enter product type, page dimensions, QR code size, and row count.</p>
         
         <form id="qrForm">
             @csrf
+            <label for="product_type">Select Product Type</label>
+            <select id="product_type" name="product_type" required>
+                <option value="" disabled selected>Select a product</option>
+                <option value="w-beam">W-Beam</option>
+                <option value="pole">Pole</option>
+                <option value="high-mast">High Mast</option>
+            </select>
             <label for="page_height">Page Height (mm)</label>
             <input type="text" id="page_height" name="page_height" required>
 

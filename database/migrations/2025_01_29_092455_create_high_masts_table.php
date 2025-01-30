@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('beams', function (Blueprint $table) {
+        Schema::create('high_masts', function (Blueprint $table) {
             table->string('id')->primary();
             $table->string('grade')->nullable();
             $table->string('batch_no')->nullable();
@@ -28,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('beams');
+        Schema::dropIfExists('high_masts');
     }
 };

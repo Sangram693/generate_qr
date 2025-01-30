@@ -16,8 +16,14 @@ return new class extends Migration
             $table->string('name');
             $table->string('email')->unique();
             $table->string('phone')->unique();
+            $table->string('user_name')->unique();
             $table->string('password');
+            $table->enum('role', ['super_admin', 'admin', 'user'])->default('user');
+            $table->unsignedBigInteger("admin_id")->nullable();
             $table->timestamps();
+
+            // Foreign Key Constraint (Mapping User to Admin)
+            $table->foreign('admin_id')->references('id')->on('users')->onDelete('set null');
         });
     }
 
