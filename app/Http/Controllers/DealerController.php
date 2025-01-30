@@ -81,6 +81,16 @@ public function login(Request $request)
     ], 200);
 }
 
+public function logout(Request $request)
+{
+    // Revoke the user's current access token
+    $request->user()->currentAccessToken()->delete();
+
+    return response()->json([
+        'message' => 'Logout successful'
+    ], 200);
+}
+
     /**
      * Display the specified resource.
      */

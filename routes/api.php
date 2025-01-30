@@ -21,7 +21,10 @@ Route::get('/high-mast/{id}', [HighMastController::class, 'show']);
 Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('/user', UserController::class);
     Route::get('/logout', [UserController::class, 'logout']);
+    Route::get('/dealer/logout', [DealerController::class, 'logout']);
     Route::apiResource('/pages', PageController::class);
     Route::post('/w-beams/bulk-update', [BeamController::class, 'bulkUpdate']);
     Route::post('/w-beams/bulk-upload', [BeamController::class, 'bulkUpload']);
+    Route::post('/poles/bulk-update', [PoleController::class, 'bulkUpdate']);
+    Route::post('/high-masts/bulk-update', [HighMastController::class, 'bulkUpdate']);
 });

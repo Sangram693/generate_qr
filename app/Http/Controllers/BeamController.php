@@ -17,7 +17,7 @@ class BeamController extends Controller
      */
     public function index()
     {
-        //
+        
     }
 
     /**
@@ -25,7 +25,7 @@ class BeamController extends Controller
      */
     public function create()
     {
-        //
+        
     }
 
     /**
@@ -33,7 +33,7 @@ class BeamController extends Controller
      */
     public function store(StoreBeamRequest $request)
     {
-        //
+        
     }
 
     /**
@@ -68,7 +68,7 @@ class BeamController extends Controller
          $city = $location ? $location->cityName : 'Unknown';
          $country = $location ? $location->countryName : 'Unknown';
  
-         // Check if the user is unique for this product
+         
          $uniqueViewer = Viewer::where([
                  ['product_type', '=', $productType],
                  ['product_id', '=', $productId],
@@ -113,7 +113,7 @@ class BeamController extends Controller
      */
     public function edit($id)
     {
-        //
+        
     }
 
     /**
@@ -125,27 +125,27 @@ class BeamController extends Controller
 
  public function bulkUpload(Request $request)
  {
-     // Validate if a file is uploaded
+     
      if (!$request->hasFile('excel_file')) {
          return response()->json(['message' => 'No file uploaded'], 400);
      }
  
-     // Get uploaded file
+     
      $file = $request->file('excel_file');
      $path = $file->getRealPath();
  
-     // Load the Excel file
+     
      $spreadsheet = IOFactory::load($path);
      $sheet = $spreadsheet->getActiveSheet();
-     $data = $sheet->toArray(null, true, true, true); // Convert to array
+     $data = $sheet->toArray(null, true, true, true); 
  
-     // Initialize counters
+     
      $inserted = 0;
      $failed = [];
  
-     // Loop through each row, starting from row 2 (assuming row 1 is headers)
+     
      foreach ($data as $index => $row) {
-         if ($index === 1) continue; // Skip headers
+         if ($index === 1) continue; 
  
          try {
              Beam::create([
@@ -160,7 +160,7 @@ class BeamController extends Controller
          }
      }
  
-     // Return summary response
+     
      return response()->json([
          'message' => 'Bulk upload completed',
          'inserted' => $inserted,
@@ -168,9 +168,23 @@ class BeamController extends Controller
      ], 200);
  }
 
-public function bulkUpdate(UpdateBeamRequest $request, Array $ids)
+public function bulkUpdate(UpdateBeamRequest $request)
 {
-   
+    $ids = $request->ids;
+
+    
+    $updateData = array_filter($request->except(['ids'])); 
+
+    if (empty($updateData)) {
+        return response()->json(['message' => 'No valid fields provided for update'], 400);
+    }
+
+    $updatedRows = Beam::whereIn('id', $ids)->update($updateData);
+
+    return response()->json([
+        'message' => $updatedRows > 0 ? 'Beams updated successfully' : 'No records updated',
+        'updated_count' => $updatedRows
+    ], 200);
 }
 
 
@@ -179,6 +193,6 @@ public function bulkUpdate(UpdateBeamRequest $request, Array $ids)
      */
     public function destroy($id)
     {
-        //
+        
     }
 }

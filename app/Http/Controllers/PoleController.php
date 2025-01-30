@@ -12,7 +12,7 @@ class PoleController extends Controller
      */
     public function index()
     {
-        //
+        
     }
 
     /**
@@ -20,7 +20,7 @@ class PoleController extends Controller
      */
     public function create()
     {
-        //
+        
     }
 
     /**
@@ -28,7 +28,7 @@ class PoleController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        
     }
 
     /**
@@ -40,6 +40,10 @@ class PoleController extends Controller
         if (!$pole) {
             return response()->json(['message' => 'Pole not found'], 404);
         }
+
+        if($pole->status == 0){
+            return response()->json(['message' => 'Pole not active'], 404);
+         }
 
         $this->trackView('pole', $id, $request);
 
@@ -56,7 +60,7 @@ class PoleController extends Controller
          $city = $location ? $location->cityName : 'Unknown';
          $country = $location ? $location->countryName : 'Unknown';
  
-         // Check if the user is unique for this product
+         
          $uniqueViewer = Viewer::where([
                  ['product_type', '=', $productType],
                  ['product_id', '=', $productId],
@@ -94,27 +98,31 @@ class PoleController extends Controller
          )->increment('total_hits');
      }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Pole $pole)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Pole $pole)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Pole $pole)
-    {
-        //
-    }
+     public function bulkUpdate(Request $request)
+     {
+         
+         $validatedData = $request->validate([
+             'ids' => 'required|array',
+             'ids.*' => 'exists:poles,id', 
+             'user_id' => 'nullable|exists:users,id'
+         ]);
+     
+         
+         $ids = $request->ids;
+     
+         
+         $updateData = array_filter($request->except(['ids'])); 
+     
+         if (empty($updateData)) {
+             return response()->json(['message' => 'No valid fields provided for update'], 400);
+         }
+     
+         
+         $updatedRows = Pole::whereIn('id', $ids)->update($updateData);
+     
+         return response()->json([
+             'message' => $updatedRows > 0 ? 'Poles updated successfully' : 'No records updated',
+             'updated_count' => $updatedRows
+         ], 200);
+     }
 }

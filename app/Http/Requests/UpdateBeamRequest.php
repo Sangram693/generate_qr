@@ -22,7 +22,15 @@ class UpdateBeamRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'excel_file' => 'required|file|mimes:xlsx,xls',
+            'ids' => 'required|array',
+            'ids.*' => 'exists:beams,id',
+            'grade' => 'nullable',
+            'batch_no' => 'nullable',
+            'serial_no' => 'nullable',
+            'gud' => 'nullable',
+            'mai' => 'nullable',
+            'status' => 'nullable',
+            'user_id' => 'nullable|exists:users,id'
         ];
     }
 
@@ -35,9 +43,7 @@ class UpdateBeamRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'excel_file.required' => 'Please upload an excel file',
-            'excel_file.file' => 'Please upload a file',
-            'excel_file.mimes' => 'Please upload a valid excel file',
+            'user_id.exists' => 'User not found'
         ];
     }
 }

@@ -12,12 +12,14 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('poles', function (Blueprint $table) {
-            $table->string('id')->primary();
+            table->string('id')->primary();
             $table->string('grade')->nullable();
             $table->string('batch_no')->nullable();
             $table->string('serial_no')->nullable();
+            $table->string('gud')->nullable();
+            $table->string('mai')->nullable();
             $table->boolean('status')->default(1);
-            $table->unsignedBigInteger('user_id');
+            $table->unsignedBigInteger('user_id')->nullable();
             $table->foreign('user_id')->references('id')->on('users')->onDelete('set null');
             $table->timestamps();
         });

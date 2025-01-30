@@ -12,7 +12,7 @@ class HighMastController extends Controller
      */
     public function index()
     {
-        //
+        
     }
 
     /**
@@ -20,7 +20,7 @@ class HighMastController extends Controller
      */
     public function create()
     {
-        //
+        
     }
 
     /**
@@ -28,7 +28,7 @@ class HighMastController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        
     }
 
     /**
@@ -40,6 +40,10 @@ class HighMastController extends Controller
         if (!$highmast) {
             return response()->json(['message' => 'Highmast not found'], 404);
         }
+
+        if($highmast->status == 0){
+            return response()->json(['message' => 'Highmast not active'], 404);
+         }
 
         $this->trackView('highmast', $id, $request);
 
@@ -56,7 +60,7 @@ class HighMastController extends Controller
          $city = $location ? $location->cityName : 'Unknown';
          $country = $location ? $location->countryName : 'Unknown';
  
-         // Check if the user is unique for this product
+         
          $uniqueViewer = Viewer::where([
                  ['product_type', '=', $productType],
                  ['product_id', '=', $productId],
@@ -94,27 +98,31 @@ class HighMastController extends Controller
          )->increment('total_hits');
      }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(HighMast $highMast)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, HighMast $highMast)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(HighMast $highMast)
-    {
-        //
-    }
+     public function bulkUpdate(Request $request)
+     {
+         
+         $request->validate([
+             'ids' => 'required|array',
+             'ids.*' => 'exists:high_masts,id',
+             'user_id' => 'nullable|exists:users,id'
+         ]);
+     
+         
+         $ids = $request->ids;
+     
+         
+         $updateData = array_filter($request->except(['ids']));
+     
+         if (empty($updateData)) {
+             return response()->json(['message' => 'No valid fields provided for update'], 400);
+         }
+     
+         
+         $updatedRows = HighMast::whereIn('id', $ids)->update($updateData);
+     
+         return response()->json([
+             'message' => $updatedRows > 0 ? 'High Masts updated successfully' : 'No records updated',
+             'updated_count' => $updatedRows
+         ], 200);
+     }
 }
