@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('high_masts', function (Blueprint $table) {
-            table->string('id')->primary();
+            $table->string('id')->primary();
             $table->string('grade')->nullable();
             $table->string('batch_no')->nullable();
             $table->string('serial_no')->nullable();
