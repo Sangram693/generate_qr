@@ -1,10 +1,6 @@
 <?php
 
 namespace App\Models;
-
-use App\Models\Beam;
-use App\Models\Pole;
-use App\Models\HighMast;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Database\Eloquent\Model;
@@ -12,7 +8,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class User extends Model
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, HasApiTokens;
 
     protected $fillable = [

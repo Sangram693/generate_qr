@@ -2,13 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use Location;
 use App\Models\Beam;
-use App\Http\Requests\StoreBeamRequest;
-use Illuminate\Http\Request;
 use App\Models\Stat;
 use App\Models\Viewer;
-use Location;
-use App\Http\Requests\UpdateBeamRequest;
+use Illuminate\Http\Request;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class BeamController extends Controller
 {
@@ -153,6 +152,8 @@ class BeamController extends Controller
                     'grade' => $row['B'] ?? null,
                     'batch_no' => $row['C'] ?? null,
                     'serial_no' => $row['D'] ?? null,
+                    'origin' => $row['E'] ?? null,
+                    'asp' => $row['F'] ?? null
              ]);
              $inserted++;
          } catch (\Exception $e) {
@@ -168,8 +169,21 @@ class BeamController extends Controller
      ], 200);
  }
 
-public function bulkUpdate(UpdateBeamRequest $request)
+public function bulkUpdate(Request $request)
 {
+
+    $validatedData = $request->validate([
+        'ids' => 'required|array',
+        'ids.*' => 'exists:poles,id', 
+        'grade' => 'nullable',
+        'batch_no' => 'nullable',
+        'serial_no' => 'nullable',
+        'gud' => 'nullable',
+        'mai' => 'nullable',
+        'status' => 'nullable',
+        'user_id' => 'nullable|exists:users,id'
+    ]);
+
     $ids = $request->ids;
 
     

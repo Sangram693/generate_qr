@@ -2,8 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use Location;
 use App\Models\Pole;
+use App\Models\Stat;
+use App\Models\Viewer;
 use Illuminate\Http\Request;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class PoleController extends Controller
 {
@@ -98,12 +102,65 @@ class PoleController extends Controller
          )->increment('total_hits');
      }
 
+     public function bulkUpload(Request $request)
+     {
+         
+         if (!$request->hasFile('excel_file')) {
+             return response()->json(['message' => 'No file uploaded'], 400);
+         }
+     
+         
+         $file = $request->file('excel_file');
+         $path = $file->getRealPath();
+     
+         
+         $spreadsheet = IOFactory::load($path);
+         $sheet = $spreadsheet->getActiveSheet();
+         $data = $sheet->toArray(null, true, true, true); 
+     
+         
+         $inserted = 0;
+         $failed = [];
+     
+         
+         foreach ($data as $index => $row) {
+             if ($index === 1) continue; 
+     
+             try {
+                 Pole::create([
+                        'id' => $row['A'],
+                        'grade' => $row['B'] ?? null,
+                        'batch_no' => $row['C'] ?? null,
+                        'serial_no' => $row['D'] ?? null,
+                        'origin' => $row['E'] ?? null,
+                        'asp' => $row['F'] ?? null
+                 ]);
+                 $inserted++;
+             } catch (\Exception $e) {
+                 $failed[] = "Row {$index}: Failed to insert record - " . $e->getMessage();
+             }
+         }
+     
+         
+         return response()->json([
+             'message' => 'Bulk upload completed',
+             'inserted' => $inserted,
+             'failed' => $failed,
+         ], 200);
+     }
+
      public function bulkUpdate(Request $request)
      {
          
          $validatedData = $request->validate([
              'ids' => 'required|array',
              'ids.*' => 'exists:poles,id', 
+             'grade' => 'nullable',
+             'batch_no' => 'nullable',
+             'serial_no' => 'nullable',
+             'gud' => 'nullable',
+             'mai' => 'nullable',
+             'status' => 'nullable',
              'user_id' => 'nullable|exists:users,id'
          ]);
      

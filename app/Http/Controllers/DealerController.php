@@ -13,7 +13,16 @@ class DealerController extends Controller
      */
     public function index()
     {
-        
+        $dealers = Dealer::with([
+            'projects' => function ($query) {
+                $query->with(['beams', 'poles', 'highMasts']);
+            }
+        ])->get();
+    
+        return response()->json([
+            'message' => 'Dealer details fetched successfully',
+            'dealers' => $dealers
+        ], 200);
     }
 
     /**
@@ -45,8 +54,7 @@ class DealerController extends Controller
     $dealer = Dealer::create($validatedData);
 
     return response()->json([
-        'message' => 'Dealer created successfully!',
-        'dealer' => $dealer
+        'message' => 'Dealer created successfully!'
     ], 201);
 }
 
@@ -66,6 +74,11 @@ public function login(Request $request)
         return response()->json(['message' => 'Invalid username'], 401);
     }
 
+    if (!$dealer->is_verify) {
+        return response()->json(['message' => 'Your account is not verified. Contact admin'], 403);
+    }
+    
+
     // Check if the password is correct
     if (!Hash::check($validatedData['password'], $dealer->password)) {
         return response()->json(['message' => 'Invalid password'], 401);
@@ -76,8 +89,8 @@ public function login(Request $request)
 
     return response()->json([
         'message' => 'Login successful',
-        'token' => $token, // Send token for API authentication
-        'dealer' => $dealer
+        'token' => $token,
+        'id' => $dealer->id
     ], 200);
 }
 
@@ -94,15 +107,29 @@ public function logout(Request $request)
     /**
      * Display the specified resource.
      */
-    public function show(Dealer $dealer)
+    public function show($id)
     {
-        
+        $dealer = Dealer::with([
+            'projects' => function ($query) {
+                $query->with(['beams', 'poles', 'highMasts']);
+            }
+        ])->find($id);
+    
+        // Check if dealer exists
+        if (!$dealer) {
+            return response()->json(['message' => 'Dealer not found'], 404);
+        }
+    
+        return response()->json([
+            'message' => 'Dealer details fetched successfully',
+            'dealer' => $dealer
+        ], 200);
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Dealer $dealer)
+    public function edit($id)
     {
         
     }
@@ -110,7 +137,7 @@ public function logout(Request $request)
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Dealer $dealer)
+    public function update(Request $request, $id)
     {
         
     }
@@ -118,7 +145,7 @@ public function logout(Request $request)
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Dealer $dealer)
+    public function destroy($id)
     {
         
     }

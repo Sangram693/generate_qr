@@ -18,14 +18,14 @@
         
         <div class="card p-4 shadow-lg">
             <table class="table table-bordered">
-                <tr><th>ID</th><td>{{ $beam->id }}</td></tr>
-                <tr><th>Grade of Steel</th><td>{{ $beam->grade ?? 'N/A' }}</td></tr>
-                <tr><th>Batch Number</th><td>{{ $beam->batch_no ?? 'N/A' }}</td></tr>
-                <tr><th>Serial Number</th><td>{{ $beam->serial_no ?? 'N/A' }}</td></tr>
-                <tr><th>GUD</th><td>{{ $beam->gud ?? 'N/A' }}</td></tr>
-                <tr><th>MAI</th><td>{{ $beam->mai ?? 'N/A' }}</td></tr>
-                <tr><th>Created At</th><td>{{ $beam->created_at }}</td></tr>
-                <tr><th>Updated At</th><td>{{ $beam->updated_at }}</td></tr>
+                <tr><th>ID</th><td>{{ $highmast->id }}</td></tr>
+                <tr><th>Grade of Steel</th><td>{{ $highmast->grade ?? 'N/A' }}</td></tr>
+                <tr><th>Batch Number</th><td>{{ $highmast->batch_no ?? 'N/A' }}</td></tr>
+                <tr><th>Serial Number</th><td>{{ $highmast->serial_no ?? 'N/A' }}</td></tr>
+                <tr><th>Origin</th><td>{{ $highmast->origin ?? 'N/A' }}</td></tr>
+                <tr><th>Asp</th><td>{{ $highmast->asp ?? 'N/A' }}</td></tr>
+                <tr><th>Created At</th><td>{{ $highmast->created_at }}</td></tr>
+                <tr><th>Updated At</th><td>{{ $highmast->updated_at }}</td></tr>
             </table>
 
             

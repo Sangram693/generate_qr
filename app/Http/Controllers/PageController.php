@@ -152,7 +152,11 @@ class PageController extends Controller
 $pdf->Rect(0, 0, $page_width, $page_height, 'F');
         
         foreach ($data as $productId) {
-            $product = Beam::find($productId);
+            $product = match ($request->product_type) {
+                'w-beam' => Beam::find($productId),
+                'pole' => Pole::find($productId),
+                'high-mast' => HighMast::find($productId)
+            };
             if (!$product) continue;
         
             
@@ -178,8 +182,8 @@ $pdf->Rect($x - 1, $y - 1, $qr_width + 4, $total_border_height + 0.7, 'D');
 
 
 $qr_x = $x + 1; 
-$qr_y = $y + $padding; 
-$pdf->ImageSVG($tempFile, $qr_x, $qr_y, $qr_width, $qr_height);
+$qr_y = $y; 
+$pdf->ImageSVG($tempFile, $qr_x, $qr_y, $qr_width, $qr_height-1);
 
 $line_y = $qr_y + $qr_height + 2; 
 $pdf->SetDrawColor($r, $g, $b); 
@@ -191,6 +195,12 @@ $logo_width = $qr_width;
 $logo_x = $x + 1 +($qr_width - $logo_width) / 2; 
 $logo_y = $qr_y + $qr_height + $padding +2; 
 $pdf->Image(public_path('ut logo up.png'), $logo_x, $logo_y, $logo_width, $logo_height);
+
+$pdf->SetFont('helvetica', 'B', 5); // Set Font (Bold)
+    $pdf->SetTextColor(0, 0, 0); // Set Black Color
+    $text_x = $logo_x + ($logo_width / 5); // Adjust text position to center
+    $text_y = $logo_y-$padding*4; // Adjust text slightly above the center
+    $pdf->Text($text_x, $text_y, $product->id); // Print Product ID
 
 
         
@@ -220,7 +230,7 @@ $pdf->Rect(0, 0, $page_width, $page_height, 'F');
         if (!file_exists($pdfPath)) {
             return response()->json(['error' => 'PDF file not generated'], 500);
         }
-        unlink($excelFile);
+        // unlink($excelFile);
         return response()->download($pdfPath);
         
         
