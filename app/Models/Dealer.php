@@ -17,7 +17,7 @@ class Dealer extends Model
     ];
 
     // Automatically hash password before saving
-    public function setDealerPassAttribute($value)
+    public function setPasswordAttribute($value)
     {
         $this->attributes['password'] = Hash::make($value);
     }
