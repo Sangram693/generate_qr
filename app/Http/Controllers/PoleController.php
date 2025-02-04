@@ -156,12 +156,10 @@ class PoleController extends Controller
              'ids' => 'required|array',
              'ids.*' => 'exists:poles,id', 
              'grade' => 'nullable',
-             'batch_no' => 'nullable',
-             'serial_no' => 'nullable',
-             'gud' => 'nullable',
-             'mai' => 'nullable',
-             'status' => 'nullable',
-             'user_id' => 'nullable|exists:users,id'
+            'batch_number' => 'nullable',
+            'origin' => 'nullable',
+            'serial_number' => 'nullable',
+            'user_id' => 'nullable|exists:users,id'
          ]);
      
          
