@@ -52,7 +52,7 @@ class BeamController extends Controller
             return response()->json(['message' => 'Beam not active'], 404);
          }
  
-         $this->trackView('beam', $id, $request);
+        //  $this->trackView('beam', $id, $request);
  
          return view('show_beam', ['beam' => $beam]);
      }

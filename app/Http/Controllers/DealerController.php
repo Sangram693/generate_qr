@@ -51,7 +51,9 @@ class DealerController extends Controller
     ]);
 
     
-    $dealer = Dealer::create($validatedData);
+    $data = Arr::except($validatedData, ['password_confirmation']);
+
+    Dealer::create($data);
 
     return response()->json([
         'message' => 'Dealer created successfully!'
