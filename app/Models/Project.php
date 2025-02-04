@@ -39,9 +39,8 @@ class Project extends Model
         return $this->belongsTo(Dealer::class, 'dealer_id');
     }
 
-    private function generateRandomString($length = 16)
+    private static function generateRandomString($length = 16)
     {
         return substr(str_shuffle('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'), 0, $length);
     }
-
 }
