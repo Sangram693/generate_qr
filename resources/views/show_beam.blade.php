@@ -13,6 +13,14 @@
 
 </head>
 <body>
+    <div class="row justify-content-center">
+        <div class="col-md-5">
+            <div class="message-box _success">
+                <i class="fa fa-check-circle"></i>
+                <h2>Utkarsh Product Verified</h2>
+            </div>
+        </div>
+    </div>
     <div class="container mt-5">
         <h2 class="text-center">Beam Details</h2>
         
