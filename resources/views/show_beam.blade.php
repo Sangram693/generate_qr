@@ -43,7 +43,7 @@
             </table>
 
             <div class="text-center mt-3">
-                <a href="{{ route('download.pdf', ['filename' => 'w-beam' '.pdf']) }}" class="btn btn-success">
+                <a href="{{ route('download.pdf', ['filename' => 'w-beam' . '.pdf']) }}" class="btn btn-success">
                     <i class="fa fa-download"></i> Download PDF
                 </a>
                 
