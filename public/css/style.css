@@ -1,40 +1,39 @@
 /* Logo Container */
 .logo-container {
     text-align: center;
-    margin-bottom: 30px;
+    margin-top: 20px;
+    margin-bottom: 20px;
 }
 
 .logo {
-    max-width: 500px; /* Increased size of the logo */
+    max-width: 250px; /* Optimal size */
     height: auto;
 }
 
+/* Success Box */
 ._success {
-    box-shadow: 0 15px 25px #00000019;
-    padding: 45px;
-    width: 90%; /* Default width for smaller screens */
-    max-width: 500px; /* Max width for larger screens */
+    box-shadow: 0 10px 20px #00000019;
+    padding: 30px; /* Reduce padding slightly */
+    width: 80%; /* Default width for smaller screens */
+    max-width: 350px; /* Proper width to prevent narrow box */
     text-align: center;
-    margin: 40px auto;
+    margin: 20px auto; /* Reduce excess margin */
     border-bottom: solid 4px #28a745;
 }
 
 ._success i {
-    font-size: 55px;
+    font-size: 40px; /* Adjust icon size */
     color: #28a745;
 }
 
 ._success h2 {
-    margin-bottom: 12px;
-    font-size: 40px;
+    font-size: 24px; /* Reduce size for better fit */
     font-weight: 500;
-    line-height: 1.2;
     margin-top: 10px;
 }
 
 ._success p {
-    margin-bottom: 0px;
-    font-size: 18px;
+    font-size: 16px;
     color: #495057;
     font-weight: 500;
 }
@@ -42,6 +41,6 @@
 /* Media Query for smaller screens */
 @media (max-width: 576px) {
     ._success {
-        width: 95%; /* Slightly wider on small screens */
+        width: 90%; /* Slightly wider on small screens */
     }
 }
