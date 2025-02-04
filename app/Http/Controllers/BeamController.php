@@ -174,7 +174,7 @@ public function bulkUpdate(Request $request)
 
     $validatedData = $request->validate([
         'ids' => 'required|array',
-        'ids.*' => 'exists:poles,id', 
+        'ids.*' => 'exists:beams,id', 
         'grade' => 'nullable',
         'batch_no' => 'nullable',
         'serial_no' => 'nullable',
