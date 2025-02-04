@@ -156,9 +156,9 @@ class HighMastController extends Controller
              'ids' => 'required|array',
              'ids.*' => 'exists:high_masts,id',
              'grade' => 'nullable',
-            'batch_number' => 'nullable',
+            'batch_no' => 'nullable',
             'origin' => 'nullable',
-            'serial_number' => 'nullable',
+            'serial_no' => 'nullable',
             'user_id' => 'nullable|exists:users,id'
          ]);
      
