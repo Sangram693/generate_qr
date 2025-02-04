@@ -171,32 +171,37 @@ class BeamController extends Controller
 
 public function bulkUpdate(Request $request)
 {
-
-    $validatedData = $request->validate([
-        'ids' => 'required|array',
-        'ids.*' => 'exists:beams,id', 
-        'grade' => 'nullable',
-        'batch_number' => 'nullable',
-        'origin' => 'nullable',
-        'serial_number' => 'nullable',
-        'user_id' => 'nullable|exists:users,id'
-    ]);
-
-    $ids = $request->ids;
-
+    try{
+        $validatedData = $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'exists:beams,id', 
+            'grade' => 'nullable',
+            'batch_number' => 'nullable',
+            'origin' => 'nullable',
+            'serial_number' => 'nullable',
+            'user_id' => 'nullable|exists:users,id'
+        ]);
     
-    $updateData = array_filter($request->except(['ids'])); 
-
-    if (empty($updateData)) {
-        return response()->json(['message' => 'No valid fields provided for update'], 400);
+        $ids = $request->ids;
+    
+        
+        $updateData = array_filter($request->except(['ids'])); 
+    
+        if (empty($updateData)) {
+            return response()->json(['message' => 'No valid fields provided for update'], 400);
+        }
+    
+        $updatedRows = Beam::whereIn('id', $ids)->update($updateData);
+    
+        return response()->json([
+            'message' => $updatedRows > 0 ? 'Beams updated successfully' : 'No records updated',
+            'updated_count' => $updatedRows
+        ], 200);
+    }catch (\Exception $e) {
+        \Log::error('Bulk Update Error', ['error' => $e->getMessage()]);
+        return response()->json(['message' => 'Internal Server Error', 'error' => $e->getMessage()], 500);
     }
-
-    $updatedRows = Beam::whereIn('id', $ids)->update($updateData);
-
-    return response()->json([
-        'message' => $updatedRows > 0 ? 'Beams updated successfully' : 'No records updated',
-        'updated_count' => $updatedRows
-    ], 200);
+    
 }
 
 
