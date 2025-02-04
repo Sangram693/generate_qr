@@ -16,9 +16,9 @@
 
 </head>
 <body>
-    <div class="logo-container">
+    {{-- <div class="logo-container">
         <img src="{{ asset('images/logo.png') }}" alt="Logo" class="logo">
-    </div>
+    </div> --}}
     <div class="row justify-content-center">
         <div class="col-md-5">
             <div class="message-box _success">
