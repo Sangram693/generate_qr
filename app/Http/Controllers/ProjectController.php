@@ -84,6 +84,11 @@ class ProjectController extends Controller
             'dealer_id' => 'nullable|exists:dealers,id'
         ]);
 
+        return response()->json([
+            'data' => $validatedData,
+            'project' => $project
+        ], 200);
+
         $project->update($validatedData);
 
         return response()->json([
