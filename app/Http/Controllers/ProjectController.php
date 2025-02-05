@@ -84,10 +84,6 @@ class ProjectController extends Controller
             'dealer_id' => 'nullable|exists:dealers,id'
         ]);
 
-        return response()->json([
-            'data' => $validatedData,
-            'project' => $project
-        ], 200);
 
         $project->update($validatedData);
 
@@ -116,6 +112,11 @@ class ProjectController extends Controller
     if (!$project) {
         return response()->json(['message' => 'Project not found'], 404);
     }
+
+    return response()->json([
+        'data' => $validatedData,
+        'project' => $project
+    ], 200);
 
     // Assign beams, poles, and high masts to the project
     if (!empty($validatedData['beams'])) {
@@ -150,6 +151,8 @@ class ProjectController extends Controller
             $highMast->save();
         }
     }
+
+    
 
     return response()->json([
         'message' => 'Components assigned to project successfully',
