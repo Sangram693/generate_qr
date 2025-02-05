@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Project;
+use App\Models\Beam;
+use App\Models\Pole;
 use App\Models\Dealer;
-use Illuminate\Http\Request;
+use App\Models\Project;
+use App\Models\HighMast;
 use Illuminate\Support\Str;
+use Illuminate\Http\Request;
 
 class ProjectController extends Controller
 {
@@ -113,10 +116,10 @@ class ProjectController extends Controller
         return response()->json(['message' => 'Project not found'], 404);
     }
 
-    return response()->json([
-        'data' => $validatedData,
-        'project' => $project
-    ], 200);
+    // return response()->json([
+    //     'data' => $validatedData,
+    //     'project' => $project
+    // ], 200);
 
     // Assign beams, poles, and high masts to the project
     if (!empty($validatedData['beams'])) {
