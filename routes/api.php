@@ -26,10 +26,8 @@ Route::middleware('auth:sanctum')->group(function () {
     
     Route::apiResource('/user', UserController::class);
     Route::get('/logout', [UserController::class, 'logout']);
-    
-    
-    Route::apiResource('/dealer', DealerController::class)->except(['store']);
     Route::get('/dealer/logout', [DealerController::class, 'logout']);
+    Route::apiResource('/dealer', DealerController::class)->except(['store']);
 
     
     Route::apiResource('/project', ProjectController::class);
