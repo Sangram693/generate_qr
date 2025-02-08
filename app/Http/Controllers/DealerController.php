@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Dealer;
 use Illuminate\Support\Arr;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class DealerController extends Controller
@@ -150,9 +151,9 @@ public function logout(Request $request)
     }
         $validatedData = $request->validate([
             'dealer_name' => 'required|string|max:255',
-            'dealer_phone' => 'required|string|max:255|unique:dealers',
-            'dealer_phone' => 'required|string|email|max:255|unique:dealers',
-            'location' => 'nullable|string|max:255'
+            'dealer_phone' => 'required|string|max:255|unique:dealers,dealer_phone,' . $id,
+            'dealer_email' => 'required|string|email|max:255|unique:dealers,dealer_email,' . $id,
+            'location' => 'nullable|string|max:255',
         ]);
 
         $dealer->update([
