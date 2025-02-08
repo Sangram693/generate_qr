@@ -142,28 +142,35 @@ public function logout(Request $request)
      * Update the specified resource in storage.
      */
     public function update(Request $request, $id)
-    {
-        $authUser = Auth::user(); 
+{
+    $authUser = Auth::user();
 
-        if ((int)$id !== (int)$authUser->id) {
-            return response()->json(['error' => 'Unauthorized'], 403);
-        }
-        $validatedData = $request->validate([
-            'dealer_name' => 'required|string|max:255',
-            'dealer_phone' => 'required|string|max:255|unique:dealers,dealer_phone,' . $id,
-            'dealer_email' => 'required|string|email|max:255|unique:dealers,dealer_email,' . $id,
-            'location' => 'nullable|string|max:255',
-        ]);
-
-        $dealer->update([
-            'dealer_name' => $validatedData['dealer_name'],
-            'dealer_phone' => $validatedData['dealer_phone'],
-            'dealer_phone' => $validatedData['dealer_phone'],
-            'location' => $validatedData['location']
-        ]);
-    
-        return response()->json(['message' => 'Dealer updated successfully'], 200);
+    // Convert ID to integer before comparison
+    if ((int)$id !== (int)$authUser->id) {
+        return response()->json(['error' => 'Unauthorized'], 403);
     }
+
+    $dealer = Dealer::find($id);
+    if (!$dealer) {
+        return response()->json(['error' => 'Dealer not found'], 404);
+    }
+
+    $validatedData = $request->validate([
+        'dealer_name' => 'required|string|max:255',
+        'dealer_phone' => 'required|string|max:255|unique:dealers,dealer_phone,' . $id,
+        'dealer_email' => 'required|string|email|max:255|unique:dealers,dealer_email,' . $id,
+        'location' => 'nullable|string|max:255',
+    ]);
+
+    $dealer->update([
+        'dealer_name' => $validatedData['dealer_name'],
+        'dealer_phone' => $validatedData['dealer_phone'],
+        'dealer_email' => $validatedData['dealer_email'], // Fix: this was missing
+        'location' => $validatedData['location']
+    ]);
+
+    return response()->json(['message' => 'Dealer updated successfully'], 200);
+}
 
     /**
      * Remove the specified resource from storage.
