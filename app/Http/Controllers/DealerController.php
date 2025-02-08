@@ -179,4 +179,38 @@ public function logout(Request $request)
     {
         
     }
+
+    public function changeDealerPassword(Request $request, $id)
+{
+    $authUser = Auth::user();
+    $dealer = Dealer::find($id);
+    
+    if (!$dealer) {
+        return response()->json(['error' => 'Dealer not found'], 404);
+    }
+    
+    // Ensure only the authenticated dealer can change their own password
+    if ((int)$id !== (int)$authUser->id) {
+        return response()->json(['error' => 'Unauthorized'], 403);
+    }
+
+    // Validate input
+    $request->validate([
+        'old_password' => 'required|string',
+        'new_password' => 'required|string|min:8|confirmed',
+    ]);
+
+    // Check if old password is correct
+    if (!Hash::check($request->old_password, $dealer->password)) {
+        return response()->json(['error' => 'Old password is incorrect'], 400);
+    }
+
+    // Update password
+    $dealer->update([
+        'password' => Hash::make($request->new_password)
+    ]);
+
+    return response()->json(['message' => 'Password updated successfully'], 200);
+}
+
 }

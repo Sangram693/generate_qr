@@ -169,4 +169,38 @@ class UserController extends Controller
     {
         
     }
+
+    public function changePassword(Request $request, $id)
+{
+    $authUser = Auth::user();
+    $user = User::find($id);
+    
+    if (!$user) {
+        return response()->json(['error' => 'User not found'], 404);
+    }
+    
+    // Ensure only the authenticated user can change their own password
+    if ($authUser->role === 'user' && (int)$id !== (int)$authUser->id) {
+        return response()->json(['error' => 'Unauthorized'], 403);
+    }
+
+    // Validate input
+    $request->validate([
+        'old_password' => 'required|string',
+        'new_password' => 'required|string|min:8|confirmed',
+    ]);
+
+    // Check if old password is correct
+    if (!Hash::check($request->old_password, $user->password)) {
+        return response()->json(['error' => 'Old password is incorrect'], 400);
+    }
+
+    // Update password
+    $user->update([
+        'password' => Hash::make($request->new_password)
+    ]);
+
+    return response()->json(['message' => 'Password updated successfully'], 200);
+}
+
 }

@@ -45,4 +45,7 @@ Route::middleware('auth:sanctum')->group(function () {
     
     Route::post('/high-masts/bulk-update', [HighMastController::class, 'bulkUpdate']);
     Route::post('/high-masts/bulk-upload', [HighMastController::class, 'bulkUpload']); 
+
+    Route::post('/user/{id}/change-password', [UserController::class, 'changePassword']);
+    Route::post('/dealer/{id}/change-password', [DealerController::class, 'changeDealerPassword']);
 });
