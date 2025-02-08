@@ -145,7 +145,7 @@ public function logout(Request $request)
     {
         $authUser = Auth::user(); 
 
-    
+        return response()->json(['error' => $authUser->id], 403);
     if ($id !== $authUser->id) {
         return response()->json(['error' => 'Unauthorized'], 403);
     }
