@@ -145,10 +145,9 @@ public function logout(Request $request)
     {
         $authUser = Auth::user(); 
 
-        return response()->json(['auth_id' => $authUser->id, 'dealer_id' => $id], 403);
-    if ($id !== $authUser->id) {
-        return response()->json(['error' => 'Unauthorized'], 403);
-    }
+        if ((int)$id !== (int)$authUser->id) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
         $validatedData = $request->validate([
             'dealer_name' => 'required|string|max:255',
             'dealer_phone' => 'required|string|max:255|unique:dealers,dealer_phone,' . $id,
