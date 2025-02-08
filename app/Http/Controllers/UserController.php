@@ -16,20 +16,20 @@ class UserController extends Controller
      */
     public function index()
 {
-    $authUser = Auth::user(); // Get the logged-in user
+    $authUser = Auth::user(); 
 
-    // If the user is an admin, show only users
+    
     if ($authUser->role === 'admin') {
         $users = User::where([
             ['role', '=', 'user'],
             ['admin_id', '=', $authUser->id]
         ])->get()->load('beams', 'poles', 'highmasts')->makeHidden('admin_id');
     } 
-    // If the user is a super_admin, show admins and users, but not super_admins
+    
     elseif ($authUser->role === 'super_admin') {
         $users = User::whereIn('role', ['admin', 'user'])->get();
     } 
-    // If the user is neither admin nor super_admin, deny access
+    
     else {
         return response()->json(['error' => 'Unauthorized'], 403);
     }
@@ -42,21 +42,21 @@ class UserController extends Controller
      */
     public function login(Request $request)
     {
-        // Validate input fields
+        
         $request->validate([
             'user_name' => 'required|string', 
             'password' => 'required|string',
         ]);
     
-        // Find user by username
+        
         $user = User::where('user_name', $request->user_name)->first();
     
-        // Check if user exists and password is correct
+        
         if (!$user || !Hash::check($request->password, $user->password)) {
             return response()->json(['message' => 'Invalid credentials'], 401);
         }
     
-        // Generate API token
+        
         $token = $user->createToken('auth_token')->plainTextToken;
     
         return response()->json([
@@ -69,7 +69,7 @@ class UserController extends Controller
 
     public function logout(Request $request)
 {
-    // Revoke the user's current access token
+    
     $request->user()->currentAccessToken()->delete();
 
     return response()->json([
@@ -82,18 +82,18 @@ class UserController extends Controller
      */
     public function store(StoreUserRequest $request)
 {
-    $authUser = Auth::user(); // Get the logged-in user
+    $authUser = Auth::user(); 
 
-    // Only Super Admin can create Admin
+    
     if ($request->role === 'admin' && $authUser->role !== 'super_admin') {
         return response()->json(['error' => 'Only Super Admin can create an Admin'], 403);
     }
 
-    // If Super Admin creates a User, admin_id is required
+    
     if ($request->role === 'user' && $authUser->role === 'super_admin') {
         $adminId = $request->admin_id;
     } 
-    // If Admin creates a User, assign their ID automatically
+    
     elseif ($request->role === 'user' && $authUser->role === 'admin') {
         $adminId = $authUser->id;
     } else {
@@ -131,24 +131,39 @@ class UserController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(User $user)
+    public function edit($id)
     {
-        //
+        
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateUserRequest $request, User $user)
-    {
-        //
+    public function update(UpdateUserRequest $request, $id)
+{
+    $authUser = Auth::user(); 
+
+    
+    if ($authUser->role === 'user' && $id !== $authUser->id) {
+        return response()->json(['error' => 'Unauthorized'], 403);
     }
+
+    
+    $user->update([
+        'name' => $request->name,
+        'email' => $request->email,
+        'phone' => $request->phone
+    ]);
+
+    return response()->json(['message' => 'User updated successfully'], 200);
+}
+
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(User $user)
+    public function destroy($id)
     {
-        //
+        
     }
 }

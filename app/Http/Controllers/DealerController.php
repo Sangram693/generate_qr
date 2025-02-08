@@ -142,7 +142,27 @@ public function logout(Request $request)
      */
     public function update(Request $request, $id)
     {
-        
+        $authUser = Auth::user(); 
+
+    
+    if ($id !== $authUser->id) {
+        return response()->json(['error' => 'Unauthorized'], 403);
+    }
+        $validatedData = $request->validate([
+            'dealer_name' => 'required|string|max:255',
+            'dealer_phone' => 'required|string|max:255|unique:dealers',
+            'dealer_phone' => 'required|string|email|max:255|unique:dealers',
+            'location' => 'nullable|string|max:255'
+        ]);
+
+        $dealer->update([
+            'dealer_name' => $validatedData['dealer_name'],
+            'dealer_phone' => $validatedData['dealer_phone'],
+            'dealer_phone' => $validatedData['dealer_phone'],
+            'location' => $validatedData['location']
+        ]);
+    
+        return response()->json(['message' => 'Dealer updated successfully'], 200);
     }
 
     /**
