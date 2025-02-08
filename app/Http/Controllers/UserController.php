@@ -147,7 +147,7 @@ class UserController extends Controller
         return response()->json(['error' => 'User not found'], 404);
     }
     
-    if ($authUser->role === 'user' && $id !== $authUser->id) {
+    if ($authUser->role === 'user' && (int)$id !== (int)$authUser->id) {
         return response()->json(['error' => 'Unauthorized'], 403);
     }
 
