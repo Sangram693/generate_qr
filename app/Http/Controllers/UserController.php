@@ -142,7 +142,10 @@ class UserController extends Controller
     public function update(UpdateUserRequest $request, $id)
 {
     $authUser = Auth::user(); 
-
+    $user = User::find($id);
+    if (!$user) {
+        return response()->json(['error' => 'User not found'], 404);
+    }
     
     if ($authUser->role === 'user' && $id !== $authUser->id) {
         return response()->json(['error' => 'Unauthorized'], 403);
