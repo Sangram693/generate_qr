@@ -23,7 +23,7 @@ class UserController extends Controller
         $users = User::where([
             ['role', '=', 'user'],
             ['admin_id', '=', $authUser->id]
-        ])->get()->load('beams', 'poles', 'highmasts')->makeHidden('admin_id');
+        ])->get()->makeHidden('admin_id');
     } 
     
     elseif ($authUser->role === 'super_admin') {
@@ -57,11 +57,20 @@ class UserController extends Controller
         }
     
         
-        $token = $user->createToken('auth_token')->plainTextToken;
+        $abilities = [];
+    if ($user->role === 'admin') {
+        $abilities[] = 'origin:' . $user->origin;
+    }
+    
+    // Create the token with abilities
+    $token = $user->createToken('auth_token', $abilities)->plainTextToken;
     
         return response()->json([
-            'message' => 'Login successful',
+            'isLogin' => true,
             'token' => $token,
+            'userName' => $user->user_name,
+            'role' => $user->role,
+            'origin' => $user->origin,
             'id' => $user->id,
         ], 200);
     }
@@ -100,6 +109,8 @@ class UserController extends Controller
         $adminId = null;
     }
 
+    // return $request->all();
+
     $user = User::create([
         'name' => $request->name,
         'email' => $request->email,
@@ -108,6 +119,7 @@ class UserController extends Controller
         'password' => $request->password,
         'role' => $request->role,
         'admin_id' => $adminId,
+        'origin' => $request->origin
     ]);
 
     return response()->json(['message' => 'User created successfully', 'user' => $user], 201);
@@ -147,19 +159,36 @@ class UserController extends Controller
         return response()->json(['error' => 'User not found'], 404);
     }
     
-    if ($authUser->role === 'user' && (int)$id !== (int)$authUser->id) {
+    // Authorization check:
+    if ($authUser->role === 'user' && (int)$authUser->id !== (int)$user->id) {
+        // Regular user can update only themselves.
         return response()->json(['error' => 'Unauthorized'], 403);
+    } elseif ($authUser->role === 'admin') {
+        // Admin can update only if the target user's admin_id matches the admin's id.
+        if ($user->admin_id != $authUser->id) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+    }
+    // Super admin can update any user; no extra check is needed.
+
+    // Prepare data for update.
+    $data = [
+        'name'      => $request->name ?? $user->name,
+        'email'     => $request->email ?? $user->email,
+        'phone'     => $request->phone ?? $user->phone,
+        'user_name' => $request->user_name ?? $user->user_name,
+    ];
+
+    // If a password is provided, hash and update it.
+    if ($request->filled('password')) {
+        $data['password'] = $request->password;
     }
 
-    
-    $user->update([
-        'name' => $request->name,
-        'email' => $request->email,
-        'phone' => $request->phone
-    ]);
+    $user->update($data);
 
     return response()->json(['message' => 'User updated successfully'], 200);
 }
+
 
 
     /**
@@ -170,19 +199,15 @@ class UserController extends Controller
         
     }
 
-    public function changePassword(Request $request, $id)
+    public function changePassword(Request $request)
 {
     $authUser = Auth::user();
-    $user = User::find($id);
+    $user = User::find($authUser->id);
     
     if (!$user) {
         return response()->json(['error' => 'User not found'], 404);
     }
     
-    // Ensure only the authenticated user can change their own password
-    if ($authUser->role === 'user' && (int)$id !== (int)$authUser->id) {
-        return response()->json(['error' => 'Unauthorized'], 403);
-    }
 
     // Validate input
     $request->validate([

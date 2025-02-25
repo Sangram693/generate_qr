@@ -7,6 +7,7 @@ use App\Models\Beam;
 use App\Models\Stat;
 use App\Models\Viewer;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class BeamController extends Controller
@@ -14,10 +15,74 @@ class BeamController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
+        $authUser = Auth::user();
+        if (!$authUser) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
         
+        $limit = $request->query('limit', 10);
+        $limit = min($limit, 100);
+        
+        if (is_null($authUser->origin)) {
+            // Superadmin: Paginate beams first, then group the current page's items by origin.
+            $paginatedBeams = Beam::orderBy('created_at', 'desc')
+                                    ->whereNotNull('batch_no')
+                                    ->paginate($limit);
+            $groupedBeams = $paginatedBeams->getCollection()->groupBy('origin');
+            $paginatedBeams->setCollection($groupedBeams);
+            
+            // Get overall totals per origin (ignoring pagination)
+            $groupTotals = Beam::selectRaw('origin, count(*) as total')
+            ->where('origin', '<>', '')
+            ->groupBy('origin')
+            ->get()
+            ->pluck('total', 'origin');
+            
+            // Build a custom response array with desired keys
+            $data = [
+                'current_page' => $paginatedBeams->currentPage(),
+                'per_page'     => $paginatedBeams->perPage(),
+                'total'        => $paginatedBeams->total(),
+                'group_totals' => $groupTotals,
+                'data'         => $groupedBeams,
+            ];
+            
+            return response()->json(['beam' => $data]);
+        } else {
+            // Admin/User: Filter beams by the user's origin and paginate (no grouping needed).
+            $paginatedBeams = Beam::orderBy('created_at', 'desc')
+                                  ->where('origin', $authUser->origin)
+                                  ->whereNotNull('batch_no')
+                                  ->paginate($limit);
+            
+            $data = $paginatedBeams->toArray();
+            // Optionally remove unwanted pagination keys if needed:
+            unset(
+                $data['first_page_url'],
+                $data['last_page_url'],
+                $data['next_page_url'],
+                $data['prev_page_url'],
+                $data['links'],
+                $data['from'],
+                $data['last_page'],
+                $data['path'],
+                $data['to']
+            );
+            $data = [
+                'current_page' => $paginatedBeams->currentPage(),
+                'per_page'     => $paginatedBeams->perPage(),
+                'total'        => $paginatedBeams->total(),
+                'data'         => [$authUser->origin => $data['data']],
+            ];
+            
+            return response()->json(['beam' => $data]);
+        }
     }
+    
+    
+
 
     /**
      * Show the form for creating a new resource.
@@ -204,6 +269,37 @@ public function bulkUpdate(Request $request)
     
 }
 
+public function mappingStatus(Request $request)
+{
+    $authUser = Auth::user();
+    if (!$authUser) {
+        return response()->json(['error' => 'Unauthorized'], 401);
+    }
+
+    if (is_null($authUser->origin)) {
+        // Superadmin: Group beams by origin.
+        $status = Beam::selectRaw("
+                        origin, 
+                        SUM(CASE WHEN batch_no IS NOT NULL THEN 1 ELSE 0 END) AS mapped_count, 
+                        SUM(CASE WHEN batch_no IS NULL THEN 1 ELSE 0 END) AS unmapped_count
+                    ")
+                    ->groupBy('origin')
+                    ->get();
+        return response()->json(['mapping_status' => $status]);
+    } else {
+        // Admin/User: Filter beams by the user's origin.
+        $status = Beam::selectRaw("
+                        SUM(CASE WHEN batch_no IS NOT NULL THEN 1 ELSE 0 END) AS mapped_count, 
+                        SUM(CASE WHEN batch_no IS NULL THEN 1 ELSE 0 END) AS unmapped_count
+                    ")
+                    ->where('origin', $authUser->origin)
+                    ->first();
+
+        $status['origin'] = $authUser->origin;
+        // Wrap the counts in an array keyed by the user's origin.
+        return response()->json(['mapping_status' => [$status]]);
+    }
+}
 
     /**
      * Remove the specified resource from storage.

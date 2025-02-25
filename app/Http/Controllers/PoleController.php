@@ -7,6 +7,7 @@ use App\Models\Pole;
 use App\Models\Stat;
 use App\Models\Viewer;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class PoleController extends Controller
@@ -14,10 +15,72 @@ class PoleController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
+        $authUser = Auth::user();
+        if (!$authUser) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
         
+        $limit = $request->query('limit', 10);
+        $limit = min($limit, 100);
+        
+        if (is_null($authUser->origin)) {
+            // Superadmin: Paginate Poles first, then group the current page's items by origin.
+            $paginatedPoles = Pole::orderBy('created_at', 'desc')
+                                    ->whereNotNull('batch_no')
+                                    ->paginate($limit);
+            $groupedPoles = $paginatedPoles->getCollection()->groupBy('origin');
+            $paginatedPoles->setCollection($groupedPoles);
+            
+            // Get overall totals per origin (ignoring pagination)
+            $groupTotals = Pole::selectRaw('origin, count(*) as total')
+            ->where('origin', '<>', '')
+            ->groupBy('origin')
+            ->get()
+            ->pluck('total', 'origin');
+            
+            // Build a custom response array with desired keys
+            $data = [
+                'current_page' => $paginatedPoles->currentPage(),
+                'per_page'     => $paginatedPoles->perPage(),
+                'total'        => $paginatedPoles->total(),
+                'group_totals' => $groupTotals,
+                'data'         => $groupedPoles,
+            ];
+            
+            return response()->json(['Pole' => $data]);
+        } else {
+            // Admin/User: Filter Poles by the user's origin and paginate (no grouping needed).
+            $paginatedPoles = Pole::orderBy('created_at', 'desc')
+                                  ->where('origin', $authUser->origin)
+                                  ->whereNotNull('batch_no')
+                                  ->paginate($limit);
+            
+            $data = $paginatedPoles->toArray();
+            // Optionally remove unwanted pagination keys if needed:
+            unset(
+                $data['first_page_url'],
+                $data['last_page_url'],
+                $data['next_page_url'],
+                $data['prev_page_url'],
+                $data['links'],
+                $data['from'],
+                $data['last_page'],
+                $data['path'],
+                $data['to']
+            );
+            $data = [
+                'current_page' => $paginatedPoles->currentPage(),
+                'per_page'     => $paginatedPoles->perPage(),
+                'total'        => $paginatedPoles->total(),
+                'data'         => [$authUser->origin => $data['data']],
+            ];
+            
+            return response()->json(['Pole' => $data]);
+        }
     }
+    
 
     /**
      * Show the form for creating a new resource.
