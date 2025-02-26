@@ -68,6 +68,7 @@ class UserController extends Controller
         return response()->json([
             'isLogin' => true,
             'token' => $token,
+            'email' => $user->email,
             'userName' => $user->user_name,
             'role' => $user->role,
             'origin' => $user->origin,
