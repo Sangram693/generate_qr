@@ -65,7 +65,7 @@ class ProductController extends Controller
     $currentPage = $request->query('page', 1);
 
     // Retrieve filter parameters.
-    $productName   = strtolower($request->input('product_name', 'all')); // expected: all, beam, high mast, pole
+    $productName   = strtolower($request->input('product_name', 'all')); // expected: all, beam, HM, pole
     $batchNo       = $request->input('batch_no');
     $id            = $request->input('id');
     $startDate     = $request->input('start_date');
@@ -112,11 +112,11 @@ class ProductController extends Controller
         $highMastResults = $applyFilters(HighMast::query())->get();
         $poleResults     = $applyFilters(Pole::query())->get();
         $results = collect($beamResults)->merge($highMastResults)->merge($poleResults);
-    } elseif ($productName === 'beam') {
+    } elseif ($productName === 'MBCB') {
         $results = $applyFilters(Beam::query())->get();
-    } elseif ($productName === 'high mast') {
+    } elseif ($productName === 'HM') {
         $results = $applyFilters(HighMast::query())->get();
-    } elseif ($productName === 'pole') {
+    } elseif ($productName === 'POLE') {
         $results = $applyFilters(Pole::query())->get();
     }
 
@@ -127,11 +127,11 @@ class ProductController extends Controller
     $transformed = $results->map(function ($item) {
         $productName = '';
         if ($item instanceof \App\Models\Beam) {
-            $productName = 'beam';
+            $productName = 'MBCB';
         } elseif ($item instanceof \App\Models\HighMast) {
-            $productName = 'high mast';
+            $productName = 'HM';
         } elseif ($item instanceof \App\Models\Pole) {
-            $productName = 'pole';
+            $productName = 'POLE';
         }
         $mappingStatus = $item->batch_no ? 'mapped' : 'unmapped';
         return [
@@ -164,7 +164,7 @@ public function report(Request $request)
     }
     
     // Retrieve required filter parameters.
-    $productName = strtolower($request->input('product_name', 'all')); // expected: all, beam, high mast, or pole
+    $productName = strtolower($request->input('product_name', 'all')); // expected: all, beam, HM, or pole
     $startDate   = $request->input('start_date');
     $endDate     = $request->input('end_date');
     
@@ -201,16 +201,16 @@ public function report(Request $request)
         $poleReport     = $runReport(Pole::query());
         
         $data = [
-            'beam'      => $beamReport,
-            'high mast' => $highMastReport,
-            'pole'      => $poleReport,
+            'MBCB'      => $beamReport,
+            'HM' => $highMastReport,
+            'POLE'      => $poleReport,
         ];
-    } elseif ($productName === 'beam') {
-        $data = ['beam' => $runReport(Beam::query())];
-    } elseif ($productName === 'high mast') {
-        $data = ['high mast' => $runReport(HighMast::query())];
-    } elseif ($productName === 'pole') {
-        $data = ['pole' => $runReport(Pole::query())];
+    } elseif ($productName === 'MBCB') {
+        $data = ['MBCB' => $runReport(Beam::query())];
+    } elseif ($productName === 'HM') {
+        $data = ['HM' => $runReport(HighMast::query())];
+    } elseif ($productName === 'POLE') {
+        $data = ['POLE' => $runReport(Pole::query())];
     } else {
         return response()->json(['error' => 'Invalid product_name value'], 400);
     }
@@ -469,9 +469,9 @@ public function quarter(Request $request)
         $pole = $poleCounts->get($q, 0);
         $total = $beam + $hm + $pole;
         $result[$q] = [
-            'beam' => $beam,
-            'high_mast' => $hm,
-            'pole' => $pole,
+            'MBCB' => $beam,
+            'HM' => $hm,
+            'POLE' => $pole,
             'total' => $total,
         ];
     }
