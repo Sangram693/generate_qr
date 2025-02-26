@@ -65,7 +65,7 @@ class ProductController extends Controller
     $currentPage = $request->query('page', 1);
 
     // Retrieve filter parameters.
-    $productName   = strtolower($request->input('product_name', 'all')); // expected: all, beam, HM, pole
+    $productName   = $request->input('product_name', 'all'); // expected: all, beam, HM, pole
     $batchNo       = $request->input('batch_no');
     $id            = $request->input('id');
     $startDate     = $request->input('start_date');
