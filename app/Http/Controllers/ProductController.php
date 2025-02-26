@@ -71,7 +71,7 @@ class ProductController extends Controller
     $startDate     = $request->input('start_date');
     $endDate       = $request->input('end_date');
     $mappingStatus = $request->input('mapping_status'); // mapped or unmapped
-    $originParam   = strtolower($request->input('origin', 'all'));
+    $originParam   = ($request->input('origin', 'all'));
 
     // Build a common filtering closure.
     $applyFilters = function ($query) use ($batchNo, $id, $startDate, $endDate, $mappingStatus, $authUser, $originParam) {
@@ -87,9 +87,9 @@ class ProductController extends Controller
             $query->whereBetween('updated_at', [$start, $end]);
         }
         if ($mappingStatus) {
-            if (strtolower($mappingStatus) === 'mapped') {
+            if (($mappingStatus) === 'mapped') {
                 $query->whereNotNull('batch_no');
-            } elseif (strtolower($mappingStatus) === 'unmapped') {
+            } elseif (($mappingStatus) === 'unmapped') {
                 $query->whereNull('batch_no');
             }
         }
@@ -164,7 +164,7 @@ public function report(Request $request)
     }
     
     // Retrieve required filter parameters.
-    $productName = strtolower($request->input('product_name', 'all')); // expected: all, beam, HM, or pole
+    $productName = ($request->input('product_name', 'all')); // expected: all, beam, HM, or pole
     $startDate   = $request->input('start_date');
     $endDate     = $request->input('end_date');
     
@@ -293,7 +293,7 @@ public function graph(Request $request)
     }
     
     // Get time_frame parameter; default to 'fy'
-    $timeFrame = strtolower($request->input('time_frame', 'fy'));
+    $timeFrame = ($request->input('time_frame', 'fy'));
     if (!in_array($timeFrame, ['fy', 'monthly'])) {
         return response()->json(['error' => 'Invalid time_frame value'], 400);
     }
@@ -391,7 +391,7 @@ public function quarter(Request $request)
     // Determine origin filter.
     // For superadmin, we can allow an optional 'origin' parameter.
     if (is_null($authUser->origin)) {
-        $originParam = strtolower($request->input('origin', 'all'));
+        $originParam = ($request->input('origin', 'all'));
         $originFilter = ($originParam !== 'all') ? $originParam : null;
     } else {
         $originFilter = $authUser->origin;
@@ -488,7 +488,7 @@ public function mapped(Request $request)
 
     // For superadmin, allow an optional 'origin' parameter; for admin, force using their origin.
     if (is_null($authUser->origin)) {
-        $originParam = strtolower($request->input('origin', 'all'));
+        $originParam = ($request->input('origin', 'all'));
         // If 'all' is provided, then we won't filter by origin; otherwise, filter by the provided value.
         $filterOrigin = ($originParam !== 'all') ? $originParam : null;
 
@@ -516,7 +516,7 @@ public function mapped(Request $request)
     // If a filterOrigin is set (for admin or if superadmin provided a specific origin), filter the collection.
     if ($filterOrigin) {
         $merged = $merged->filter(function ($item) use ($filterOrigin) {
-            return strtolower($item->origin) === strtolower($filterOrigin);
+            return ($item->origin) === ($filterOrigin);
         });
     }
 
