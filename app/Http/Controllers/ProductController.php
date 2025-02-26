@@ -199,18 +199,24 @@ public function report(Request $request)
         $beamReport     = $runReport(Beam::query());
         $highMastReport = $runReport(HighMast::query());
         $poleReport     = $runReport(Pole::query());
+        $beamReport['product_name'] = 'MBCB';
+        $highMastReport['product_name'] = 'HM';
+        $poleReport['product_name'] = 'POLE';
+
+        $data = array_merge($beamReport->toArray(), $highMastReport->toArray(), $poleReport->toArray());
         
-        $data = [
-            'MBCB'      => $beamReport,
-            'HM' => $highMastReport,
-            'POLE'      => $poleReport,
-        ];
     } elseif ($productName === 'MBCB') {
-        $data = ['MBCB' => $runReport(Beam::query())];
+        $beamReport     = $runReport(Beam::query());
+        $beamReport['product_name'] = 'MBCB';
+        $data = $beamReport;
     } elseif ($productName === 'HM') {
-        $data = ['HM' => $runReport(HighMast::query())];
+        $highMastReport = $runReport(HighMast::query());
+        $highMastReport['product_name'] = 'HM';
+        $data = $highMastReport;
     } elseif ($productName === 'POLE') {
-        $data = ['POLE' => $runReport(Pole::query())];
+        $poleReport     = $runReport(Pole::query());
+        $poleReport['product_name'] = 'POLE';
+        $data = $poleReport;
     } else {
         return response()->json(['error' => 'Invalid product_name value'], 400);
     }
