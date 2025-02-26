@@ -22,10 +22,12 @@ class UpdateUserRequest extends FormRequest
      */
     public function rules(): array
     {
+        $userId = $this->route('id');
         return [
             'name' => 'sometimes|string|max:255',
-            'email' => 'sometimes|string|email|max:255|unique:users,email,' . $this->user()->id,
-            'phone' => 'sometimes|string|max:15|unique:users,phone,' . $this->user()->id,
+            'email' => 'sometimes|string|email|max:255|unique:users,email,' . $userId,
+            'phone' => 'sometimes|string|max:15|unique:users,phone,' . $userId,
+            'user_name' => 'sometimes|string|max:255|unique:users,user_name,' . $userId,
         ];
     }
 }
