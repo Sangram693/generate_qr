@@ -164,7 +164,7 @@ public function report(Request $request)
     }
     
     // Retrieve required filter parameters.
-    $productName = ($request->input('product_name', 'all')); // expected: all, beam, HM, or pole
+    $productName = strtoupper($request->input('product_name', 'ALL')); // expected: ALL, MBCB, HM, or POLE
     $startDate   = $request->input('start_date');
     $endDate     = $request->input('end_date');
     
@@ -183,46 +183,45 @@ public function report(Request $request)
     }
     
     // Prepare a helper function to run the report query on a given model.
-    $runReport = function($modelQuery) use ($start, $end, $originFilter) {
+    $runReport = function($modelQuery, $productName) use ($start, $end, $originFilter) {
         if ($originFilter) {
             $modelQuery->where('origin', $originFilter);
         }
         return $modelQuery->whereBetween('updated_at', [$start, $end])
             ->selectRaw("DATE(updated_at) as date, count(*) as quantity")
             ->groupBy('date')
-            ->get();
+            ->get()
+            ->map(function ($item) use ($productName) {
+                return [
+                    'date' => $item->date,
+                    'quantity' => $item->quantity,
+                    'product_name' => $productName,
+                ];
+            });
     };
     
     $data = [];
-    if ($productName === 'all') {
-        // For "all", get report for each product type.
-        $beamReport     = $runReport(Beam::query());
-        $highMastReport = $runReport(HighMast::query());
-        $poleReport     = $runReport(Pole::query());
-        $beamReport['product_name'] = 'MBCB';
-        $highMastReport['product_name'] = 'HM';
-        $poleReport['product_name'] = 'POLE';
-
-        $data = array_merge($beamReport->toArray(), $highMastReport->toArray(), $poleReport->toArray());
+    if ($productName === 'ALL') {
+        // For "ALL", get report for each product type and merge into a single array.
+        $beamReport     = $runReport(Beam::query(), 'MBCB');
+        $highMastReport = $runReport(HighMast::query(), 'HM');
+        $poleReport     = $runReport(Pole::query(), 'POLE');
         
+        // Merge all reports into a single array.
+        $data = array_merge($beamReport->toArray(), $highMastReport->toArray(), $poleReport->toArray());
     } elseif ($productName === 'MBCB') {
-        $beamReport     = $runReport(Beam::query());
-        $beamReport['product_name'] = 'MBCB';
-        $data = $beamReport;
+        $data = $runReport(Beam::query(), 'MBCB');
     } elseif ($productName === 'HM') {
-        $highMastReport = $runReport(HighMast::query());
-        $highMastReport['product_name'] = 'HM';
-        $data = $highMastReport;
+        $data = $runReport(HighMast::query(), 'HM');
     } elseif ($productName === 'POLE') {
-        $poleReport     = $runReport(Pole::query());
-        $poleReport['product_name'] = 'POLE';
-        $data = $poleReport;
+        $data = $runReport(Pole::query(), 'POLE');
     } else {
         return response()->json(['error' => 'Invalid product_name value'], 400);
     }
     
     return response()->json(['report' => $data]);
 }
+
 
 public function total(Request $request)
 {
