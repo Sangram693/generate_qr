@@ -67,7 +67,7 @@ class ProductController extends Controller
     // Retrieve filter parameters.
     $productName   = $request->input('product_name', 'all'); // expected: all, beam, HM, pole
     $batchNo       = $request->input('batch_no');
-    $id            = $request->input('id');
+    $id            = $request->input('serial_no');
     $startDate     = $request->input('start_date');
     $endDate       = $request->input('end_date');
     $mappingStatus = $request->input('mapping_status'); // mapped or unmapped
