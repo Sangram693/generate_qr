@@ -396,8 +396,8 @@ public function quarter(Request $request)
     // Determine origin filter.
     // For superadmin, we can allow an optional 'origin' parameter.
     if (is_null($authUser->origin)) {
-        $originParam = ($request->input('origin', 'all'));
-        $originFilter = ($originParam !== 'all') ? $originParam : null;
+        $originParam = ($request->input('origin', 'null'));
+        $originFilter = ($originParam !== 'null') ? $originParam : null;
     } else {
         $originFilter = $authUser->origin;
     }
