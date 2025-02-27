@@ -51,9 +51,9 @@ class PageController extends Controller
         };
 
         $baseUrl = match ($request->product_type) {
-            'w-beam' => 'http://utkarshsmart.in/api/w-beam/',
-            'pole' => 'http://utkarshsmart.in/api/pole/',
-            'high-mast' => 'http://utkarshsmart.in/api/high-mast/',
+            'w-beam' => 'http://verify.utkarshsmart.in/api/w-beam/',
+            'pole' => 'http://verify.utkarshsmart.in/api/pole/',
+            'high-mast' => 'http://verify.utkarshsmart.in/api/high-mast/',
         };
 
         [$r, $g, $b] = match ($request->product_type) {
