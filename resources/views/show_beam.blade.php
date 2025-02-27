@@ -16,9 +16,7 @@
 
 </head>
 <body>
-    {{-- <div class="logo-container">
-        <img src="{{ asset('images/logo.png') }}" alt="Logo" class="logo">
-    </div> --}}
+    @if(!empty($pole->batch_no))
     <div class="row justify-content-center">
         <div class="col-md-5">
             <div class="message-box _success">
@@ -27,6 +25,7 @@
             </div>
         </div>
     </div>
+    @endif
     <div class="container mt-5">
         <h2 class="text-center">Beam Details</h2>
         

@@ -10,9 +10,22 @@
 
     <!-- jQuery for AJAX -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 
 </head>
 <body>
+
+    @if(!empty($pole->batch_no))
+    <div class="row justify-content-center">
+        <div class="col-md-5">
+            <div class="message-box _success">
+                <i class="fa fa-check-circle"></i>
+                <h2>Utkarsh Product Verified</h2>
+            </div>
+        </div>
+    </div>
+    @endif
     <div class="container mt-5">
         <h2 class="text-center">High Mast Details</h2>
         
