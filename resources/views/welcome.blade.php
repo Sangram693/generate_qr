@@ -127,7 +127,7 @@
                 method: "POST",
                 body: formData,
                 headers: {
-                    "Authorization": "Bearer 144|9iB2Wf9YbfcoIeP10OTEghGcKURHtAATEE9bhzX8390f651b"
+                    "Authorization": `Bearer ${localStorage.getItem("authToken")}`
                 }
             })
             .then(response => {

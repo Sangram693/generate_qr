@@ -111,7 +111,7 @@ class HighMastController extends Controller
             return response()->json(['message' => 'Highmast not active'], 404);
          }
 
-        $this->trackView('highmast', $id, $request);
+        // $this->trackView('highmast', $id, $request);
 
         return view('show_high_mast', ['highmast' => $highMast]);
     }

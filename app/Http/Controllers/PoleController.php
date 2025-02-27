@@ -104,6 +104,8 @@ class PoleController extends Controller
     public function show($id, Request $request)
     {
         $pole = Pole::find($id);
+
+
         if (!$pole) {
             return response()->json(['message' => 'Pole not found'], 404);
         }
@@ -112,7 +114,7 @@ class PoleController extends Controller
             return response()->json(['message' => 'Pole not active'], 404);
          }
 
-        $this->trackView('pole', $id, $request);
+        // $this->trackView('pole', $id, $request);
 
         return view('show_pole', ['pole' => $pole]);
     }

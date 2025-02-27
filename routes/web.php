@@ -11,8 +11,10 @@ Route::get('/sangram/roygupta/{id}/sneider/{name}', function ($id, $name) {
 });
 
 
+
+
 Route::get('/', function(){
-    return "<h1>Sangram Roygupta</h1>";
+    return view('login');
 });
 
 Route::get('/download/{filename}', function ($filename) {
