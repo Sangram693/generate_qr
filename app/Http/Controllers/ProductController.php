@@ -60,8 +60,8 @@ class ProductController extends Controller
         return response()->json(['error' => 'Unauthorized'], 401);
     }
     
-    $limit = $request->query('limit', 10);
-    $limit = min($limit, 100);
+    $limit = $request->query('limit', 1000);
+    $limit = min($limit, 1000);
     $currentPage = $request->query('page', 1);
 
     // Retrieve filter parameters.
