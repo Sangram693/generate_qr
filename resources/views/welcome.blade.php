@@ -127,7 +127,7 @@
                 method: "POST",
                 body: formData,
                 headers: {
-                    "Authorization": "Bearer 1|acXNA9f8HWqf479zG4qDmX4IC3r3hrO4Vyj3gzag77e0a821"
+                    "Authorization": "Bearer 144|9iB2Wf9YbfcoIeP10OTEghGcKURHtAATEE9bhzX8390f651b"
                 }
             })
             .then(response => {
