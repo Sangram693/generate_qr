@@ -16,7 +16,7 @@
 
 </head>
 <body>
-    @if(!empty($pole->batch_no))
+    @if(!empty($beam->batch_no))
     <div class="row justify-content-center">
         <div class="col-md-5">
             <div class="message-box _success">
