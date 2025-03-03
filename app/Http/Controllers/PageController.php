@@ -42,7 +42,10 @@ class PageController extends Controller
         $sheet->setTitle('Random Data');
 
         
-        $sheet->setCellValue('A1', 'id');
+        $sheet->setCellValue('A1', 'serial_no');
+        $sheet->setCellValue('B1', 'grade');
+        $sheet->setCellValue('C1', 'batch_no');
+        $sheet->setCellValue('D1', 'asp');
 
         $productModel = match ($request->product_type) {
             'w-beam' => Beam::class,
@@ -88,7 +91,10 @@ class PageController extends Controller
         $writer = new Xlsx($spreadsheet);
         $writer->save($storagePath);
 
-        
+        \Log::info('Storing Page:', [
+            'product_type' => $request->product_type,
+            'request_data' => $request->all()
+        ]);
         $page = Page::create([
             'page_height' => $request->page_height,
             'page_width' => $request->page_width,
@@ -100,10 +106,18 @@ class PageController extends Controller
             'qr_width' => $request->qr_width,
             'excel_file' => $filePath, 
             'user_id' => $request->user_id,
+            'product' => $request->product_type,
         ]);
 
         
-
+        $prefix = match ($request->product_type) {
+            'w-beam' => 'MBCB-',
+            'pole' => 'POLE-',
+            'high-mast' => 'HM-',
+        };
+        $lastProduct = $page::latest()->first();
+        $lastProductId = $lastProduct ? $lastProduct->id : 'N/A';
+        $headerText = $prefix . $lastProductId;
         
         $page_width = $request->page_width;
         $page_height = $request->page_height;
@@ -141,15 +155,23 @@ class PageController extends Controller
         $qr_per_page = $columns * $rows;
         $count = 0;
         $x = $margin_left;
-        $y = $margin_top;
+        $y = $margin_top*2;
         
         $tempPath = storage_path('app/public/temp_qr_codes/');
         if (!file_exists($tempPath)) {
             mkdir($tempPath, 0777, true);
         }
 
+       
+
+
+
         $pdf->SetFillColor(255, 255, 255, 0); 
-$pdf->Rect(0, 0, $page_width, $page_height, 'F');
+        $pdf->Rect(0, 0, $page_width, $page_height, 'F');
+        $pdf->SetFont('helvetica', 'B', 12);
+        $pdf->SetTextColor($r, $g, $b);
+        $pdf->SetXY(0, 0); // Adjust position if needed
+        $pdf->Cell(0, 0, $headerText, 0, 1, 'C', true);
         
         foreach ($data as $productId) {
             $product = match ($request->product_type) {
@@ -215,29 +237,92 @@ $pdf->SetFont('helvetica', 'B', 5); // Set Font (Bold)
         
             if ($count % $qr_per_page == 0) {
                 $pdf->AddPage();
+            
+                // Set Background
                 $pdf->SetFillColor(255, 255, 255, 0); 
-$pdf->Rect(0, 0, $page_width, $page_height, 'F');
+                $pdf->Rect(0, 0, $page_width, $page_height, 'F');
+            
+                // Set Font and Text Color
+                $pdf->SetFont('helvetica', 'B', 12);
+                $pdf->SetTextColor($r, $g, $b);
+            
+                // Print Header Text
+                $pdf->SetXY(0, 0);
+                $pdf->Cell(0, 0, $headerText, 0, 1, 'C', true);
+            
                 $x = $margin_left;
-                $y = $margin_top;
+                $y = $margin_top * 2;
             }
+            
         
             unlink($tempFile);
         }
-        
-        $pdfPath = storage_path('app/public/beam_qrcodes_' . '.pdf');
+        $pdfDirectory = storage_path('app/public/pdf_files/');
+if (!file_exists($pdfDirectory)) {
+    mkdir($pdfDirectory, 0777, true);
+}
+        $pdfFileName = 'beam_qrcodes_' . time() . '.pdf';
+        $pdfPath = $pdfDirectory . $pdfFileName;
         $pdf->Output($pdfPath, 'F');
         
         if (!file_exists($pdfPath)) {
             return response()->json(['error' => 'PDF file not generated'], 500);
         }
-        // unlink($excelFile);
-        return response()->download($pdfPath);
-        
+        $pdfPath = 'storage/pdf_files/' . $pdfFileName;
+       
+        $response = response()->json([
+            'excel_url' => asset($filePath),
+            'pdf_url' => asset($pdfPath),
+        ], 200);
+
+
+return $response;
         
     }
+
+    
 
     private function generateRandomString($length = 16)
     {
         return substr(str_shuffle('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'), 0, $length);
     }
+
+    public function getHeaderOptions()
+    {
+        $pages = Page::orderBy('id', 'desc')->get()->map(function ($page) {
+            $prefix = match ($page->product) {
+                'w-beam' => 'MBCB-',
+                'pole' => 'POLE-',
+                'high-mast' => 'HM-',
+            };
+    
+            return [
+                'id' => $page->id,
+                'headerText' => $prefix . $page->id,
+            ];
+        });
+    
+        return response()->json(['data' => $pages]);
+    }
+    
+
+public function getHeaderData($id)
+{
+    $page = Page::find($id);
+
+    if (!$page) {
+        return response()->json(['error' => 'Page not found'], 404);
+    }
+
+    return response()->json([
+        'headerText' => match ($page->product) {
+            'w-beam' => 'MBCB-' . $page->id,
+            'pole' => 'POLE-' . $page->id,
+            'high-mast' => 'HM-' . $page->id,
+        },
+        'excel_url' => asset($page->excel_file),
+        'product' => $page->product,
+    ]);
+}
+
 }

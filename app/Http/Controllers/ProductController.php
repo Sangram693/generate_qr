@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Carbon\Carbon;
 use App\Models\Beam;
+use App\Models\Page;
 use App\Models\Pole;
 use App\Models\Product;
 use App\Models\HighMast;
@@ -11,6 +12,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\UpdateProductRequest;
+use Illuminate\Support\Facades\Storage;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class ProductController extends Controller
 {
@@ -567,7 +570,114 @@ public function mapped(Request $request)
     }
 }
 
+public function bulkMapped(Request $request)
+{
+    ini_set('max_execution_time', 300); // Increase execution time
 
+    $authUser = Auth::user();
+    if (!$authUser) {
+        return response()->json(['error' => 'Unauthorized'], 401);
+    }
+
+    $batchNo = $request->input('batch_no');
+    if (!$batchNo) {
+        return response()->json(['message' => 'Batch number is required'], 400);
+    }
+
+    $headerId = $request->input('header_id');
+    if (!$headerId) {
+        return response()->json(['message' => 'Header ID is required'], 400);
+    }
+
+    try {
+        // Fetch the Page record
+        $page = Page::find($headerId);
+        if (!$page) {
+            return response()->json(['error' => 'Page not found'], 404);
+        }
+        
+        $product = $page->product;
+
+        $filePath = str_replace('storage/', '', $page->excel_file); // Remove 'storage/' prefix
+        $storagePath = public_path("storage/{$filePath}");
+        
+        if (!file_exists($storagePath)) {
+            return response()->json([
+                'message' => 'Excel file not found',
+                'path' => $storagePath
+            ], 400);
+        }
+        
+        $spreadsheet = IOFactory::load($storagePath);
+        $sheet = $spreadsheet->getActiveSheet();
+        $data = $sheet->toArray(null, true, true, true);
+
+        $origin = ($authUser->role === 'super_admin' && $request->has('origin')) 
+                    ? $request->input('origin') 
+                    : $authUser->origin;
+
+        $updated = 0;
+        $failed = [];
+        $updateDataList = [];
+
+        foreach ($data as $index => $row) {
+            if ($index === 1) continue; // Skip header row
+
+            $id = $row['A'] ?? null;
+            if (!$id) {
+                $failed[] = "Row {$index}: Missing ID.";
+                continue;
+            }
+
+            $updateData = [
+                'grade'    => $row['B'] ?? null,
+                'batch_no' => $batchNo,
+                'origin'   => $origin,
+                'asp'      => $row['D'] ?? null
+            ];
+
+            $updateData = array_filter($updateData, fn($value) => !is_null($value));
+
+            if (empty($updateData)) {
+                $failed[] = "Row {$index}: No fields to update.";
+                continue;
+            }
+
+            $updateDataList[] = ['id' => $id] + $updateData;
+        }
+
+        // Determine model based on product type
+        $modelClass = null;
+        if ($product === 'w-beam') {
+            $modelClass = Beam::class;
+        } elseif ($product === 'high-mast') {
+            $modelClass = HighMast::class;
+        } elseif ($product === 'pole') {
+            $modelClass = Pole::class;
+        } else {
+            return response()->json(['message' => 'Invalid product type'], 400);
+        }
+
+        // Perform batch update
+        foreach ($updateDataList as $update) {
+            $affectedRows = $modelClass::where('id', $update['id'])->update($update);
+            if ($affectedRows) {
+                $updated++;
+            } else {
+                $failed[] = "ID {$update['id']}: No matching record found.";
+            }
+        }
+
+        return response()->json([
+            'message' => 'Bulk update completed',
+            'mapped'  => $updated,
+            'failed'  => $failed,
+        ], 200);
+    } catch (\Exception $e) {
+        \Log::error('Bulk Update Error', ['error' => $e->getMessage()]);
+        return response()->json(['message' => 'Internal Server Error', 'error' => $e->getMessage()], 500);
+    }
+}
 
 
 

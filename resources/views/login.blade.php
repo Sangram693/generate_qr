@@ -107,7 +107,7 @@
                     
                     // Redirect to the QR Code generation page
                     setTimeout(() => {
-                        window.location.href = "{{ url('/sangram/roygupta/143/sneider/qr') }}";
+                        window.location.href = "{{ url('/generate') }}";
                     }, 1000);
                 } else {
                     responseMessage.className = "error";

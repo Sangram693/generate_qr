@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    
+
     <title>Generate QR Code PDF</title>
 
     <!-- Fonts -->
@@ -12,26 +13,35 @@
 
     <!-- Styles -->
     <style>
+        /* *{
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        } */
         body {
             font-family: 'Figtree', sans-serif;
             text-align: center;
-            margin: 50px;
+            /* margin: 50px; */
         }
+
         .container {
             max-width: 600px;
             margin: 0 auto;
             padding: 20px;
             border: 1px solid #ddd;
             border-radius: 10px;
-            box-shadow: 2px 2px 10px rgba(0,0,0,0.1);
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
             background: #f9f9f9;
         }
+
         h1 {
             color: #333;
         }
+
         p {
             color: #555;
         }
+
         .btn {
             display: inline-block;
             padding: 10px 20px;
@@ -43,39 +53,64 @@
             border: none;
             cursor: pointer;
         }
+
+        .btn_logout {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #dc3474;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-left: 80vw;
+            border: none;
+            cursor: pointer;
+        }
+
         .btn:hover {
             background-color: #2779bd;
         }
+
         form {
             display: flex;
             flex-direction: column;
             gap: 10px;
             text-align: left;
         }
+
         label {
             font-weight: 600;
         }
-        input, button, select {
+
+        input,
+        button,
+        select {
             padding: 10px;
             width: 100%;
             border: 1px solid #ccc;
             border-radius: 5px;
         }
+
         button {
             background-color: #28a745;
             color: white;
             cursor: pointer;
         }
+
         button:hover {
             background-color: #218838;
         }
     </style>
 </head>
+
 <body>
+
+    <div class="logout">
+        <a href="#" class="btn_logout">Logout</a>
+    </div>
     <div class="container">
         <h1>Generate PDF with QR Codes</h1>
         <p style="color: #ff0000">Enter product type, page dimensions, QR code size, and row count.</p>
-        
+
         <form id="qrForm">
             @csrf
             <label for="product_type">Select Product Type</label>
@@ -120,36 +155,53 @@
 
     <!-- JavaScript for handling form submission -->
     <script>
-        function submitForm() {
-            let formData = new FormData(document.getElementById("qrForm"));
+        document.addEventListener("DOMContentLoaded", function() {
+            if (!localStorage.getItem('authToken')) {
+                window.location.href = "/sangram/roygupta/143/sneider/qr"; // Redirect if token is missing
+            }
+        });
 
-            fetch("{{ url('/api/pages') }}", {
-                method: "POST",
-                body: formData,
-                headers: {
-                    "Authorization": "Bearer 144|9iB2Wf9YbfcoIeP10OTEghGcKURHtAATEE9bhzX8390f651b"
-                }
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error("Failed to generate PDF");
-                }
-                return response.blob();
-            })
-            .then(blob => {
-                let url = window.URL.createObjectURL(blob);
-                let a = document.createElement("a");
-                a.href = url;
-                a.download = "qrcodes.pdf";
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                document.getElementById("responseMessage").innerText = "PDF generated successfully!";
-            })
-            .catch(error => {
-                document.getElementById("responseMessage").innerText = "Error: " + error.message;
-            });
-        }
+        document.querySelector(".btn_logout").addEventListener("click", function(event) {
+            event.preventDefault(); // Prevent default link behavior
+            localStorage.removeItem("authToken"); // Clear token
+            window.location.href = "/sangram/roygupta/143/sneider/qr"; // Redirect to login page
+        });
+
+        function submitForm() {
+    let formData = new FormData(document.getElementById("qrForm"));
+
+    fetch("{{ url('/api/pages') }}", {
+            method: "POST",
+            body: formData,
+            headers: {
+                "Authorization": "Bearer " + localStorage.getItem('authToken')
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log("API Response:", data); // Debugging
+            if (data.excel_url && data.pdf_url) {
+                // downloadFile(data.excel_url, "data.xlsx");
+                downloadFile(data.pdf_url, "data.pdf");
+            } else {
+                document.getElementById("responseMessage").innerText = "Invalid response format";
+            }
+        })
+        .catch(error => {
+            document.getElementById("responseMessage").innerText = "Error: " + error.message;
+        });
+
+    function downloadFile(url, filename) {
+        let link = document.createElement("a");
+        link.href = url;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+}
+
     </script>
 </body>
+
 </html>

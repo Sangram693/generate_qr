@@ -30,10 +30,9 @@
         
         <div class="card p-4 shadow-lg">
             <table class="table table-bordered">
-                <tr><th>ID</th><td>{{ $pole->id }}</td></tr>
+                <tr><th>Serial Number</th><td>{{ $pole->id }}</td></tr>
                 <tr><th>Grade of Steel</th><td>{{ $pole->grade ?? 'N/A' }}</td></tr>
                 <tr><th>Batch Number</th><td>{{ $pole->batch_no ?? 'N/A' }}</td></tr>
-                <tr><th>Serial Number</th><td>{{ $pole->serial_no ?? 'N/A' }}</td></tr>
                 <tr><th>Origin</th><td>{{ $pole->origin ?? 'N/A' }}</td></tr>
                 <tr><th>Asp</th><td>{{ $pole->asp ?? 'N/A' }}</td></tr>
                 <tr><th>Created At</th><td>{{ $pole->created_at }}</td></tr>

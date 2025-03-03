@@ -4,10 +4,12 @@ namespace App\Http\Controllers;
 
 use Location;
 use App\Models\Beam;
+use App\Models\Page;
 use App\Models\Stat;
 use App\Models\Viewer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class BeamController extends Controller
@@ -189,6 +191,23 @@ class BeamController extends Controller
 
  public function bulkUpload(Request $request)
  {
+
+    $authUser = Auth::user();
+    if (!$authUser) {
+        return response()->json(['error' => 'Unauthorized'], 401);
+    }
+
+    if ($authUser->role === 'superadmin') {
+        if (!$request->has('origin')) {
+            return response()->json(['message' => 'Origin is required for superadmin'], 400);
+        }
+        $origin = $request->input('origin'); // Take origin from the request
+    } elseif ($authUser->role === 'admin') {
+        $origin = $authUser->origin; // Use the admin's assigned origin
+    } else {
+        return response()->json(['message' => 'Unauthorized role'], 403);
+    }
+
      
      if (!$request->hasFile('excel_file')) {
          return response()->json(['message' => 'No file uploaded'], 400);
@@ -216,9 +235,8 @@ class BeamController extends Controller
                     'id' => $row['A'],
                     'grade' => $row['B'] ?? null,
                     'batch_no' => $row['C'] ?? null,
-                    'serial_no' => $row['D'] ?? null,
-                    'origin' => $row['E'] ?? null,
-                    'asp' => $row['F'] ?? null
+                    'origin' => $origin,
+                    'asp' => $row['D'] ?? null
              ]);
              $inserted++;
          } catch (\Exception $e) {
@@ -241,10 +259,9 @@ public function bulkUpdate(Request $request)
             'ids' => 'required|array',
             'ids.*' => 'exists:beams,id', 
             'grade' => 'nullable',
-            'batch_no' => 'nullable',
-            'origin' => 'nullable',
-            'serial_no' => 'nullable',
-            'user_id' => 'nullable|exists:users,id'
+            'batch_no' => 'required',
+            'origin' => 'required',
+            'user_id' => 'required|exists:users,id'
         ]);
     
         $ids = $request->ids;

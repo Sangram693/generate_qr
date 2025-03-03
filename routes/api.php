@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BeamController;
+use App\Http\Controllers\FileController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\PoleController;
 use App\Http\Controllers\UserController;
@@ -46,6 +47,7 @@ Route::middleware('auth:sanctum')->group(function () {
     
     Route::post('/w-beams/bulk-update', [BeamController::class, 'bulkUpdate']);
     Route::post('/w-beams/bulk-upload', [BeamController::class, 'bulkUpload']);
+    // Route::post('/w-beams/bulk-mapped', [BeamController::class, 'bulkUpdateFromExcel']);
     
     Route::post('/poles/bulk-update', [PoleController::class, 'bulkUpdate']);
     Route::post('/poles/bulk-upload', [PoleController::class, 'bulkUpload']); 
@@ -63,4 +65,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/product/graph', [ProductController::class, 'graph']);
     Route::post('/product/quarter', [ProductController::class, 'quarter']);
     Route::post('/product/mapped', [ProductController::class, 'mapped']);
+    Route::post('/product/bulk-mapped', [ProductController::class, 'bulkMapped']);
+
+    Route::get('/header-options', [PageController::class, 'getHeaderOptions']);
+    Route::get('/header-data/{id}', [PageController::class, 'getHeaderData']);
+
 });

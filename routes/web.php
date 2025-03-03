@@ -2,27 +2,31 @@
 
 use Illuminate\Support\Facades\Route;
 
-Route::get('/sangram/roygupta/{id}/sneider/{name}', function ($id, $name) {
-    if ($id == 143 && $name == 'qr') {
-        return view('welcome');
-    } else {
-        abort(403, 'Unauthorized Access');
-    }
+Route::get('/generate', function () {
+    return view('welcome');
 });
 
 
 
 
-Route::get('/', function(){
-    return view('login');
+Route::get('/sangram/roygupta/{id}/sneider/{name}', function($id, $name){
+    if($id == 143 && $name == 'qr'){
+        return view('login');
+    }
 });
 
-Route::get('/download/{filename}', function ($filename) {
-    $filePath = public_path("download/{$filename}");
-
-    if (File::exists($filePath)) {
-        return Response::download($filePath);
-    } else {
-        abort(404, "File not found!");
+Route::get('/download/excel/{file}', function ($file) {
+    $path = storage_path("app/public/excel_files/$file");
+    if (file_exists($path)) {
+        return response()->download($path)->deleteFileAfterSend(true);
     }
-})->name('download.pdf');
+    return response()->json(['error' => 'File not found'], 404);
+});
+
+Route::get('/download/pdf/{file}', function ($file) {
+    $path = storage_path("app/public/pdf_files/$file");
+    if (file_exists($path)) {
+        return response()->download($path)->deleteFileAfterSend(true);
+    }
+    return response()->json(['error' => 'File not found'], 404);
+});

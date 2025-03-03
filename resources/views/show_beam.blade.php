@@ -31,10 +31,9 @@
         
         <div class="card p-4 shadow-lg">
             <table class="table table-bordered">
-                <tr><th>ID</th><td>{{ $beam->id }}</td></tr>
+                <tr><th>Serial Number</th><td>{{ $beam->id }}</td></tr>
                 <tr><th>Grade of Steel</th><td>{{ $beam->grade ?? 'N/A' }}</td></tr>
                 <tr><th>Batch Number</th><td>{{ $beam->batch_no ?? 'N/A' }}</td></tr>
-                <tr><th>Serial Number</th><td>{{ $beam->serial_no ?? 'N/A' }}</td></tr>
                 <tr><th>Origin</th><td>{{ $beam->origin ?? 'N/A' }}</td></tr>
                 <tr><th>Asp</th><td>{{ $beam->asp ?? 'N/A' }}</td></tr>
                 <tr><th>Created At</th><td>{{ $beam->created_at }}</td></tr>

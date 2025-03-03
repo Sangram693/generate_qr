@@ -31,10 +31,9 @@
         
         <div class="card p-4 shadow-lg">
             <table class="table table-bordered">
-                <tr><th>ID</th><td>{{ $highmast->id }}</td></tr>
+                <tr><th>Serial Number</th><td>{{ $highmast->id }}</td></tr>
                 <tr><th>Grade of Steel</th><td>{{ $highmast->grade ?? 'N/A' }}</td></tr>
                 <tr><th>Batch Number</th><td>{{ $highmast->batch_no ?? 'N/A' }}</td></tr>
-                <tr><th>Serial Number</th><td>{{ $highmast->serial_no ?? 'N/A' }}</td></tr>
                 <tr><th>Origin</th><td>{{ $highmast->origin ?? 'N/A' }}</td></tr>
                 <tr><th>Asp</th><td>{{ $highmast->asp ?? 'N/A' }}</td></tr>
                 <tr><th>Created At</th><td>{{ $highmast->created_at }}</td></tr>
