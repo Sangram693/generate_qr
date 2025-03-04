@@ -602,10 +602,7 @@ public function bulkMapped(Request $request)
         $storagePath = public_path("storage/{$filePath}");
         
         if (!file_exists($storagePath)) {
-            return response()->json([
-                'message' => 'Excel file not found',
-                'path' => $storagePath
-            ], 400);
+            return response()->json(['message' => 'Excel file not found'], 400);
         }
         
         $spreadsheet = IOFactory::load($storagePath);
@@ -616,16 +613,13 @@ public function bulkMapped(Request $request)
                     ? $request->input('origin') 
                     : $authUser->origin;
 
-        $updated = 0;
-        $failed = [];
-        $updateDataList = [];
+        $updatedRecords = [];
 
         foreach ($data as $index => $row) {
             if ($index === 1) continue; // Skip header row
 
             $id = $row['A'] ?? null;
             if (!$id) {
-                $failed[] = "Row {$index}: Missing ID.";
                 continue;
             }
 
@@ -639,45 +633,40 @@ public function bulkMapped(Request $request)
             $updateData = array_filter($updateData, fn($value) => !is_null($value));
 
             if (empty($updateData)) {
-                $failed[] = "Row {$index}: No fields to update.";
                 continue;
             }
 
-            $updateDataList[] = ['id' => $id] + $updateData;
-        }
+            // Determine model based on product type
+            $modelClass = match ($product) {
+                'w-beam'    => Beam::class,
+                'high-mast' => HighMast::class,
+                'pole'      => Pole::class,
+                default     => null,
+            };
+            
+            if (!$modelClass) {
+                return response()->json(['message' => 'Invalid product type'], 400);
+            }
+            
 
-        // Determine model based on product type
-        $modelClass = null;
-        if ($product === 'w-beam') {
-            $modelClass = Beam::class;
-        } elseif ($product === 'high-mast') {
-            $modelClass = HighMast::class;
-        } elseif ($product === 'pole') {
-            $modelClass = Pole::class;
-        } else {
-            return response()->json(['message' => 'Invalid product type'], 400);
-        }
-
-        // Perform batch update
-        foreach ($updateDataList as $update) {
-            $affectedRows = $modelClass::where('id', $update['id'])->update($update);
+            // Perform update
+            $affectedRows = $modelClass::where('id', $id)->update($updateData);
             if ($affectedRows) {
-                $updated++;
-            } else {
-                $failed[] = "ID {$update['id']}: No matching record found.";
+                $updatedRecords[] = [
+                    'id'           => $id,
+                    'product'      => $product === 'w-beam' ? 'MBCB' : ($product === 'high-mast' ? 'HM' : 'POLE'),
+                    'mapped_date'  => now()->toDateTimeString()
+                ];
             }
         }
 
-        return response()->json([
-            'message' => 'Bulk update completed',
-            'mapped'  => $updated,
-            'failed'  => $failed,
-        ], 200);
+        return response()->json($updatedRecords, 200);
     } catch (\Exception $e) {
         \Log::error('Bulk Update Error', ['error' => $e->getMessage()]);
         return response()->json(['message' => 'Internal Server Error', 'error' => $e->getMessage()], 500);
     }
 }
+
 
 
 
