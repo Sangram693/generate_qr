@@ -30,3 +30,12 @@ Route::get('/download/pdf/{file}', function ($file) {
     }
     return response()->json(['error' => 'File not found'], 404);
 });
+
+Route::get('/download/{filename}', function ($filename) {
+    $path = public_path("download/$filename");
+
+    if (file_exists($path)) {
+        return response()->download($path);
+    }
+    return response()->json(['error' => 'File not found'], 404);
+})->name('download.pdf');
