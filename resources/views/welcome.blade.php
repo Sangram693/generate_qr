@@ -53,9 +53,6 @@
         }
 
         .btn_logout {
-            position: absolute;
-            top: 10px;
-            right: 20px;
             padding: 10px 20px;
             background-color: #dc3545;
             color: white;
