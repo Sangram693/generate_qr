@@ -128,8 +128,6 @@
 
 <body>
 
-    <a href="#" class="btn_logout">Logout</a>
-
     <div class="container" id="mainContainer">
         <h1>Generate PDF with QR Codes</h1>
         <p style="color: #ff0000;">Enter product type, page dimensions, QR code size, and row count.</p>
@@ -179,6 +177,8 @@
     <div id="response-box">
         <h1><i class="fa-solid fa-circle-check"></i></h1>
         <p id="responseMessage">PDF downloaded successfully!</p>
+        <br>
+        <a href="#" class="btn_logout">Logout</a>
     </div>
 
     <!-- JavaScript -->
