@@ -184,6 +184,8 @@
                 // downloadFile(data.excel_url, "data.xlsx");
                 downloadFile(data.pdf_url, "data.pdf");
                 document.getElementById("qrForm").style.display = "none";
+                document.querySelector("h1").style.display = "none";
+                document.querySelector("p").style.display = "none";
                 document.getElementById("responseMessage").innerText = "PDF successfully downloaded!";
                 document.getElementById("responseMessage").style.color = "green"; // Change color to green
             } else {
