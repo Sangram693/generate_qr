@@ -10,6 +10,8 @@
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
+<!-- Font Awesome 6 CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
     <!-- Styles -->
     <style>
@@ -107,7 +109,7 @@
     <div class="logout">
         <a href="#" class="btn_logout">Logout</a>
     </div>
-    <div class="container">
+    <div class="container" id="mainContainer">
         <h1>Generate PDF with QR Codes</h1>
         <p style="color: #ff0000">Enter product type, page dimensions, QR code size, and row count.</p>
 
@@ -150,7 +152,18 @@
             <button type="button" onclick="submitForm()">Generate PDF</button>
         </form>
 
-        <p id="responseMessage" style="color: red; font-weight: bold;"></p>
+         {{-- <p id="responseMessage" style="color: red; font-weight: bold;"></p>  --}}
+
+         <div id="response-box" style="display: none; text-align: center; padding: 20px; border-radius: 8px; background: #f0fdf4; border: 1px solid #34d399;">
+            <h1 style="color: #047857; font-size: 24px; margin-bottom: 10px;">
+                <i class="fa-solid fa-circle-check" style="color: #10b981; font-size: 40px;"></i>
+            </h1>
+            <p id="responseMessage" style="color: #065f46; font-size: 18px; font-weight: 600;">
+                PDF downloaded successfully!
+            </p>
+        </div>
+        
+        
     </div>
 
     <!-- JavaScript for handling form submission -->
@@ -183,9 +196,7 @@
             if (data.excel_url && data.pdf_url) {
                 // downloadFile(data.excel_url, "data.xlsx");
                 downloadFile(data.pdf_url, "data.pdf");
-                document.getElementById("qrForm").style.display = "none";
-                document.querySelector("h1").style.display = "none";
-                document.querySelector("p").style.display = "none";
+                document.getElementById("mainContainer").style.display = "none";
                 document.getElementById("responseMessage").innerText = "PDF successfully downloaded!";
                 document.getElementById("responseMessage").style.color = "green"; // Change color to green
             } else {
