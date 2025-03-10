@@ -127,7 +127,7 @@
 
     <div class="container" id="mainContainer">
         <h1>Generate PDF with QR Codes</h1>
-        <p style="color: #ff0000;">Enter product type, page dimensions, QR code size, and row count.</p>
+        <p style="color: #000000;">Enter product type, page dimensions, QR code size, and row count.</p>
 
         <form id="qrForm">
             @csrf
