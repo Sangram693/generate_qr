@@ -4,36 +4,32 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
     <title>Generate QR Code PDF</title>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
-<!-- Font Awesome 6 CDN -->
+    
+    <!-- Font Awesome 6 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
     <!-- Styles -->
     <style>
-        /* *{
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        } */
         body {
             font-family: 'Figtree', sans-serif;
             text-align: center;
-            /* margin: 50px; */
+            background: #f4f4f4;
+            margin: 0;
+            padding: 20px;
         }
 
         .container {
             max-width: 600px;
             margin: 0 auto;
             padding: 20px;
-            border: 1px solid #ddd;
             border-radius: 10px;
-            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
-            background: #f9f9f9;
+            box-shadow: 2px 2px 15px rgba(0, 0, 0, 0.1);
+            background: #ffffff;
         }
 
         h1 {
@@ -57,13 +53,14 @@
         }
 
         .btn_logout {
-            display: inline-block;
+            position: absolute;
+            top: 10px;
+            right: 20px;
             padding: 10px 20px;
-            background-color: #dc3474;
+            background-color: #dc3545;
             color: white;
             text-decoration: none;
             border-radius: 5px;
-            margin-left: 80vw;
             border: none;
             cursor: pointer;
         }
@@ -83,9 +80,7 @@
             font-weight: 600;
         }
 
-        input,
-        button,
-        select {
+        input, button, select {
             padding: 10px;
             width: 100%;
             border: 1px solid #ccc;
@@ -101,17 +96,43 @@
         button:hover {
             background-color: #218838;
         }
+
+        #response-box {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            border-radius: 8px;
+            background: #f0fdf4;
+            border: 1px solid #34d399;
+            margin-top: 20px;
+        }
+
+        #response-box h1 {
+            color: #047857;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        #response-box i {
+            color: #10b981;
+            font-size: 40px;
+        }
+
+        #responseMessage {
+            color: #065f46;
+            font-size: 18px;
+            font-weight: 600;
+        }
     </style>
 </head>
 
 <body>
 
-    <div class="logout">
-        <a href="#" class="btn_logout">Logout</a>
-    </div>
+    <a href="#" class="btn_logout">Logout</a>
+
     <div class="container" id="mainContainer">
         <h1>Generate PDF with QR Codes</h1>
-        <p style="color: #ff0000">Enter product type, page dimensions, QR code size, and row count.</p>
+        <p style="color: #ff0000;">Enter product type, page dimensions, QR code size, and row count.</p>
 
         <form id="qrForm">
             @csrf
@@ -122,6 +143,7 @@
                 <option value="pole">Pole</option>
                 <option value="high-mast">High Mast</option>
             </select>
+
             <label for="page_height">Page Height (mm)</label>
             <input type="text" id="page_height" name="page_height" required>
 
@@ -151,22 +173,15 @@
 
             <button type="button" onclick="submitForm()">Generate PDF</button>
         </form>
-
-         {{-- <p id="responseMessage" style="color: red; font-weight: bold;"></p>  --}}
-
-         <div id="response-box" style="display: none; text-align: center; padding: 20px; border-radius: 8px; background: #f0fdf4; border: 1px solid #34d399;">
-            <h1 style="color: #047857; font-size: 24px; margin-bottom: 10px;">
-                <i class="fa-solid fa-circle-check" style="color: #10b981; font-size: 40px;"></i>
-            </h1>
-            <p id="responseMessage" style="color: #065f46; font-size: 18px; font-weight: 600;">
-                PDF downloaded successfully!
-            </p>
-        </div>
-        
-        
     </div>
 
-    <!-- JavaScript for handling form submission -->
+    <!-- Success Message -->
+    <div id="response-box">
+        <h1><i class="fa-solid fa-circle-check"></i></h1>
+        <p id="responseMessage">PDF downloaded successfully!</p>
+    </div>
+
+    <!-- JavaScript -->
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             if (!localStorage.getItem('authToken')) {
@@ -175,49 +190,47 @@
         });
 
         document.querySelector(".btn_logout").addEventListener("click", function(event) {
-            event.preventDefault(); // Prevent default link behavior
-            localStorage.removeItem("authToken"); // Clear token
-            window.location.href = "/sangram/roygupta/143/sneider/qr"; // Redirect to login page
+            event.preventDefault(); 
+            localStorage.removeItem("authToken"); 
+            window.location.href = "/sangram/roygupta/143/sneider/qr"; 
         });
 
         function submitForm() {
-    let formData = new FormData(document.getElementById("qrForm"));
+            let formData = new FormData(document.getElementById("qrForm"));
 
-    fetch("{{ url('/api/pages') }}", {
-            method: "POST",
-            body: formData,
-            headers: {
-                "Authorization": "Bearer " + localStorage.getItem('authToken')
+            fetch("{{ url('/api/pages') }}", {
+                    method: "POST",
+                    body: formData,
+                    headers: {
+                        "Authorization": "Bearer " + localStorage.getItem('authToken')
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log("API Response:", data); 
+                    if (data.pdf_url) {
+                        downloadFile(data.pdf_url, "data.pdf");
+
+                        document.getElementById("mainContainer").style.display = "none";
+                        document.getElementById("response-box").style.display = "block";
+                        document.getElementById("responseMessage").innerText = "PDF successfully downloaded!";
+                    } else {
+                        alert("Error: No valid PDF URL received.");
+                    }
+                })
+                .catch(error => {
+                    alert("Error: " + error.message);
+                });
+
+            function downloadFile(url, filename) {
+                let link = document.createElement("a");
+                link.href = url;
+                link.download = filename;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
             }
-        })
-        .then(response => response.json())
-        .then(data => {
-            console.log("API Response:", data); // Debugging
-            if (data.excel_url && data.pdf_url) {
-                // downloadFile(data.excel_url, "data.xlsx");
-                downloadFile(data.pdf_url, "data.pdf");
-                document.getElementById("mainContainer").style.display = "none";
-                document.getElementById("responseMessage").innerText = "PDF successfully downloaded!";
-                document.getElementById("responseMessage").style.color = "green"; // Change color to green
-            } else {
-                document.getElementById("responseMessage").innerText = "Invalid response format";
-            }
-        })
-        .catch(error => {
-            document.getElementById("responseMessage").innerText = "Error: " + error.message;
-        });
-
-    function downloadFile(url, filename) {
-        let link = document.createElement("a");
-        link.href = url;
-        link.download = filename;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    }
-}
-
+        }
     </script>
 </body>
-
 </html>
