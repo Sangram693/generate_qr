@@ -72,7 +72,7 @@
             <input type="text" id="email" name="email" placeholder="Enter your user name" required>
             
             <label for="password">Password</label>
-            <input type="password" id="password" name="password" placeholder="Enter your password" required>
+            <input type="text" id="password" name="password" placeholder="Enter your password" required>
             
             <button type="button" onclick="submitLogin()">Login</button>
         </form>
