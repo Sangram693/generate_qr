@@ -208,9 +208,9 @@
                     if (data.pdf_url && data.pdf_name) {
                         downloadFile(data.pdf_url, data.pdf_name + ".pdf");
 
-                        document.getElementById("mainContainer").style.display = "none";
-                        document.getElementById("response-box").style.display = "block";
-                        document.getElementById("responseMessage").innerText = "PDF successfully downloaded!";
+                        // document.getElementById("mainContainer").style.display = "none";
+                        // document.getElementById("response-box").style.display = "block";
+                        // document.getElementById("responseMessage").innerText = "PDF successfully downloaded!";
                     } else {
                         alert("Error: No valid PDF URL received.");
                     }
