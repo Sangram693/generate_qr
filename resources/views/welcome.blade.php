@@ -205,8 +205,8 @@
                 .then(response => response.json())
                 .then(data => {
                     console.log("API Response:", data); 
-                    if (data.pdf_url) {
-                        downloadFile(data.pdf_url, "data.pdf");
+                    if (data.pdf_url && data.pdf_name) {
+                        downloadFile(data.pdf_url, data.pdf_name + ".pdf");
 
                         document.getElementById("mainContainer").style.display = "none";
                         document.getElementById("response-box").style.display = "block";

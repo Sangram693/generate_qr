@@ -12,6 +12,7 @@ use App\Http\Requests\StorePageRequest;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use Carbon\Carbon;
 
 class PageController extends Controller
 {
@@ -32,7 +33,7 @@ class PageController extends Controller
         $request->validated([
             'product_type' => 'required|in:w-beam, pole, high-mast'
         ]);
-
+        $date = Carbon::now()->format('d-m-Y');
         
         $rowNumber = $request->row_number;
 
@@ -269,10 +270,11 @@ if (!file_exists($pdfDirectory)) {
             return response()->json(['error' => 'PDF file not generated'], 500);
         }
         $pdfPath = 'storage/pdf_files/' . $pdfFileName;
-       
+        $pdfName = "QR-{$headerText}-{$date}";
         $response = response()->json([
             'excel_url' => asset($filePath),
             'pdf_url' => asset($pdfPath),
+            'pdf_name' => $pdfName
         ], 200);
 
 
