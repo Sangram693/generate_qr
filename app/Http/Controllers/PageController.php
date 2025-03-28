@@ -236,7 +236,7 @@ $pdf->SetFont('helvetica', 'B', 5); // Set Font (Bold)
                 $y += $qr_total_height + $margin_top;
             }
         
-            if ($count > 1 && $count % $qr_per_page == 1) {
+            if ($count % $qr_per_page == 0 && $count != $rowNumber) {
                 $pdf->AddPage();
             
                 // Set Background
