@@ -172,7 +172,7 @@ class PageController extends Controller
         $pdf->SetFont('helvetica', 'B', 12);
         $pdf->SetTextColor($r, $g, $b);
         $pdf->SetXY(0, 0); // Adjust position if needed
-        $pdf->Cell(0, 0, $headerText, 0, 1, 'C', true);
+        $pdf->Cell(0, 0, $headerText, 0, 1, 'C', false);
         
         foreach ($data as $productId) {
             $product = match ($request->product_type) {
