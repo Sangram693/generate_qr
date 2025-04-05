@@ -167,8 +167,8 @@ class PageController extends Controller
 
 
 
-        $pdf->SetFillColor(255, 255, 255, 0); 
-        $pdf->Rect(0, 0, $page_width, $page_height, 'F');
+        // $pdf->SetFillColor(255, 255, 255, 0); 
+        // $pdf->Rect(0, 0, $page_width, $page_height, 'F');
         $pdf->SetFont('helvetica', 'B', 12);
         $pdf->SetTextColor($r, $g, $b);
         $pdf->SetXY(0, 0); // Adjust position if needed
