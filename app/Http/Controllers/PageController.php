@@ -240,8 +240,8 @@ $pdf->SetFont('helvetica', 'B', 5); // Set Font (Bold)
                 $pdf->AddPage();
             
                 // Set Background
-                $pdf->SetFillColor(255, 255, 255, 0); 
-                $pdf->Rect(0, 0, $page_width, $page_height, 'F');
+                // $pdf->SetFillColor(255, 255, 255, 0); 
+                // $pdf->Rect(0, 0, $page_width, $page_height, 'F');
             
                 // Set Font and Text Color
                 $pdf->SetFont('helvetica', 'B', 12);
