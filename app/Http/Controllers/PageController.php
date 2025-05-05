@@ -108,6 +108,7 @@ class PageController extends Controller
             'excel_file' => $filePath, 
             'user_id' => $request->user_id,
             'product' => $request->product_type,
+            'total_rows' => $rowNumber,
         ]);
 
         

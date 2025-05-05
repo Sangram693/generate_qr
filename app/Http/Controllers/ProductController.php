@@ -589,16 +589,23 @@ public function bulkMapped(Request $request)
         return response()->json(['message' => 'Header ID is required'], 400);
     }
 
+    $totalScan = $request->input('total_scan');
+    if (!$totalScan || !is_numeric($totalScan)) {
+        return response()->json(['message' => 'Total scan is required and must be numeric'], 400);
+    }
+
     try {
-        // Fetch the Page record
         $page = Page::find($headerId);
         if (!$page) {
             return response()->json(['error' => 'Page not found'], 404);
         }
-        
-        $product = $page->product;
 
-        $filePath = str_replace('storage/', '', $page->excel_file); // Remove 'storage/' prefix
+        $product = $page->product;
+        $startIndex = $page->start_index;
+        $totalRows = $page->total_rows;
+        $endIndex = min($startIndex + $totalScan - 1, $totalRows); // Do not exceed total rows
+
+        $filePath = str_replace('storage/', '', $page->excel_file);
         $storagePath = public_path("storage/{$filePath}");
         
         if (!file_exists($storagePath)) {
@@ -616,12 +623,12 @@ public function bulkMapped(Request $request)
         $updatedRecords = [];
 
         foreach ($data as $index => $row) {
-            if ($index === 1) continue; // Skip header row
+            if ($index === 1) continue; // Skip header
+            if ($index < $startIndex) continue; // Skip rows before start_index
+            if ($index > $endIndex) break; // Stop after end_index
 
             $id = $row['A'] ?? null;
-            if (!$id) {
-                continue;
-            }
+            if (!$id) continue;
 
             $updateData = [
                 'grade'    => $row['B'] ?? null,
@@ -631,25 +638,19 @@ public function bulkMapped(Request $request)
             ];
 
             $updateData = array_filter($updateData, fn($value) => !is_null($value));
+            if (empty($updateData)) continue;
 
-            if (empty($updateData)) {
-                continue;
-            }
-
-            // Determine model based on product type
             $modelClass = match ($product) {
                 'w-beam'    => Beam::class,
                 'high-mast' => HighMast::class,
                 'pole'      => Pole::class,
                 default     => null,
             };
-            
+
             if (!$modelClass) {
                 return response()->json(['message' => 'Invalid product type'], 400);
             }
-            
 
-            // Perform update
             $affectedRows = $modelClass::where('id', $id)->update($updateData);
             if ($affectedRows) {
                 $updatedRecords[] = [
@@ -659,8 +660,13 @@ public function bulkMapped(Request $request)
                 ];
             }
         }
+
+        // Update page start_index and possibly isMapped
         if (!empty($updatedRecords)) {
-            $page->isMapped = true;
+            $page->start_index = $endIndex + 1;
+            if ($page->start_index > $totalRows) {
+                $page->isMapped = true;
+            }
             $page->save();
         }
 
@@ -670,7 +676,6 @@ public function bulkMapped(Request $request)
         return response()->json(['message' => 'Internal Server Error', 'error' => $e->getMessage()], 500);
     }
 }
-
 
 
 
