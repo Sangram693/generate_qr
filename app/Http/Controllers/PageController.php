@@ -301,10 +301,13 @@ return $response;
                 'pole' => 'POLE-',
                 'high-mast' => 'HM-',
             };
+
+            $remainingRows = $page->total_rows - $page->start_index + 1;
     
             return [
                 'id' => $page->id,
                 'headerText' => $prefix . $page->id,
+                'remainingRows' => $remainingRows
             ];
         });
     
