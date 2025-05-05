@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('pages', function (Blueprint $table) {
-            //
+            $table->boolean('isMapped')->default(false); // Add the new column with default value
         });
     }
 
@@ -22,7 +22,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('pages', function (Blueprint $table) {
-            //
+            $table->dropColumn('isMapped'); // Remove the column on rollback
         });
     }
 };
