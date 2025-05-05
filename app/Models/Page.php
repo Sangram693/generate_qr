@@ -20,7 +20,8 @@ class Page extends Model
         'qr_width',
         'excel_file',
         'user_id',
-        'product'
+        'product',
+        'total_rows'
     ];
 
     public function user()
