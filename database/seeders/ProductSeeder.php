@@ -33,7 +33,7 @@ class ProductSeeder extends Seeder
                 'name' => 'POLE',
                 'code' => 'PL001',
                 'description' => 'Standard Pole',
-                'category' => 'Infrastructure',
+                'category' => 'Lighting',
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
