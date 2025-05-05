@@ -291,7 +291,10 @@ return $response;
 
     public function getHeaderOptions()
     {
-        $pages = Page::orderBy('id', 'desc')->get()->map(function ($page) {
+        $pages = Page::where('isMapped', false)
+        ->orderBy('id', 'desc')
+        ->get()
+        ->map(function ($page) {
             $prefix = match ($page->product) {
                 'w-beam' => 'MBCB-',
                 'pole' => 'POLE-',

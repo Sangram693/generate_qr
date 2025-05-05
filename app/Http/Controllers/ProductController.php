@@ -659,6 +659,10 @@ public function bulkMapped(Request $request)
                 ];
             }
         }
+        if (!empty($updatedRecords)) {
+            $page->isMapped = true;
+            $page->save();
+        }
 
         return response()->json($updatedRecords, 200);
     } catch (\Exception $e) {
