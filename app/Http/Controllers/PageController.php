@@ -249,7 +249,7 @@ $pdf->SetFont('helvetica', 'B', 5); // Set Font (Bold)
                 $pdf->SetTextColor($r, $g, $b);
             
                 // Print Header Text
-                $pdf->SetXY(0, 0);
+                $pdf->SetXY(0, -15);
                 $pdf->Cell(0, 0, $headerText, 0, 1, 'C', false);
             
                 $x = $margin_left;
