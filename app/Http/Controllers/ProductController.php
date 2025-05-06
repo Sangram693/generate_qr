@@ -580,6 +580,8 @@ public function bulkMapped(Request $request)
     }
 
     $batchNo = $request->input('batch_no');
+    $grade = $request->input('grade');
+    $asp = $request->input('asp');
     if (!$batchNo) {
         return response()->json(['message' => 'Batch number is required'], 400);
     }
@@ -631,10 +633,10 @@ public function bulkMapped(Request $request)
             if (!$id) continue;
 
             $updateData = [
-                'grade'    => $row['B'] ?? null,
+                'grade'    => $grade,
                 'batch_no' => $batchNo,
                 'origin'   => $origin,
-                'asp'      => $row['D'] ?? null
+                'asp'      => $asp
             ];
 
             $updateData = array_filter($updateData, fn($value) => !is_null($value));
