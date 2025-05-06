@@ -702,9 +702,9 @@ public function unmappedSingle(Request $request)
     try {
         // Determine the model class based on the product type
         $modelClass = match ($product) {
-            'w-beam'    => Beam::class,
-            'high-mast' => HighMast::class,
-            'pole'      => Pole::class,
+            'MBCB'    => Beam::class,
+            'HM' => HighMast::class,
+            'POLE'      => Pole::class,
             default     => null,
         };
 
@@ -725,7 +725,7 @@ public function unmappedSingle(Request $request)
             // Record unmapped successfully
             $unmappedRecord = [
                 'id'          => $id,
-                'product'     => $product === 'w-beam' ? 'MBCB' : ($product === 'high-mast' ? 'HM' : 'POLE'),
+                'product'     => $product,
                 'unmapped_at' => now()->toDateTimeString()
             ];
 
