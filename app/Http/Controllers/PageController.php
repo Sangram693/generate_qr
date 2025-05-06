@@ -140,10 +140,7 @@ class PageController extends Controller
         $pdf->SetMargins($margin_left, $margin_top, $margin_right);
         $pdf->SetAutoPageBreak(true, $margin_bottom);
         $pdf->AddPage();
-        $pdf->SetFont('helvetica', 'B', 12);
-        $pdf->SetTextColor($r, $g, $b);
-        $pdf->SetY(-10); // Adjust position if needed
-        $pdf->Cell(0, 0, $headerText, 0, 1, 'C', false);
+        
         $logoPath = public_path('UT LOGO.png');
         if (!file_exists($logoPath)) {
             return response()->json(['error' => 'Logo file not found'], 500);
@@ -173,7 +170,10 @@ class PageController extends Controller
 
         // $pdf->SetFillColor(255, 255, 255, 0); 
         // $pdf->Rect(0, 0, $page_width, $page_height, 'F');
-        
+        $pdf->SetFont('helvetica', 'B', 12);
+        $pdf->SetTextColor($r, $g, $b);
+        $pdf->SetXY(0, 0); // Adjust position if needed
+        $pdf->Cell(0, -10, $headerText, 0, 1, 'C', false);
         
         foreach ($data as $productId) {
             $product = match ($request->product_type) {
@@ -249,7 +249,7 @@ $pdf->SetFont('helvetica', 'B', 5); // Set Font (Bold)
                 $pdf->SetTextColor($r, $g, $b);
             
                 // Print Header Text
-                $pdf->SetY(-10);
+                $pdf->SetXY(0, 0);
                 $pdf->Cell(0, 0, $headerText, 0, 1, 'C', false);
             
                 $x = $margin_left;
