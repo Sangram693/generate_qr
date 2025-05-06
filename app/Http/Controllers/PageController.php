@@ -172,8 +172,8 @@ class PageController extends Controller
         // $pdf->Rect(0, 0, $page_width, $page_height, 'F');
         $pdf->SetFont('helvetica', 'B', 12);
         $pdf->SetTextColor($r, $g, $b);
-        $pdf->SetXY(0, -1000); // Adjust position if needed
-        $pdf->Cell(0, -10, $headerText, 0, 1, 'C', false);
+        $pdf->SetXY(0, -20); // Adjust position if needed
+        $pdf->Cell(0, 0, $headerText, 0, 1, 'C', false);
         $pdf->SetXY(0, 0);
         foreach ($data as $productId) {
             $product = match ($request->product_type) {
