@@ -165,16 +165,16 @@ class PageController extends Controller
         }
 
        
-        $pdf->SetY(-10);
+
 
 
         // $pdf->SetFillColor(255, 255, 255, 0); 
         // $pdf->Rect(0, 0, $page_width, $page_height, 'F');
         $pdf->SetFont('helvetica', 'B', 12);
         $pdf->SetTextColor($r, $g, $b);
-        // Adjust position if needed
+        $pdf->SetXY(0, 0); // Adjust position if needed
         $pdf->Cell(0, 0, $headerText, 0, 1, 'C', false);
-        $pdf->SetXY(0, 0);
+        
         foreach ($data as $productId) {
             $product = match ($request->product_type) {
                 'w-beam' => Beam::find($productId),
