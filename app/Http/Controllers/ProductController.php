@@ -679,6 +679,65 @@ public function bulkMapped(Request $request)
     }
 }
 
+public function unmappedSingle(Request $request)
+{
+    ini_set('max_execution_time', 300); // Increase execution time
+
+    $authUser = Auth::user();
+    if (!$authUser) {
+        return response()->json(['error' => 'Unauthorized'], 401);
+    }
+
+    // Validate and retrieve the data from the request
+    $id = $request->input('id');
+    if (!$id) {
+        return response()->json(['message' => 'ID is required'], 400);
+    }
+
+    $product = $request->input('product');
+    if (!$product) {
+        return response()->json(['message' => 'Product is required'], 400);
+    }
+
+    try {
+        // Determine the model class based on the product type
+        $modelClass = match ($product) {
+            'w-beam'    => Beam::class,
+            'high-mast' => HighMast::class,
+            'pole'      => Pole::class,
+            default     => null,
+        };
+
+        if (!$modelClass) {
+            return response()->json(['message' => 'Invalid product type'], 400);
+        }
+
+        // Attempt to unmap the single record
+        $affectedRows = $modelClass::where('id', $id)->update([
+            'grade'    => null,
+            'batch_no' => null,
+            'origin'   => null,
+            'asp'      => null,
+            'user_id'  => null,
+        ]);
+
+        if ($affectedRows) {
+            // Record unmapped successfully
+            $unmappedRecord = [
+                'id'          => $id,
+                'product'     => $product === 'w-beam' ? 'MBCB' : ($product === 'high-mast' ? 'HM' : 'POLE'),
+                'unmapped_at' => now()->toDateTimeString()
+            ];
+
+            return response()->json($unmappedRecord, 200);
+        } else {
+            return response()->json(['message' => 'Record not found or already unmapped'], 404);
+        }
+    } catch (\Exception $e) {
+        \Log::error('Single Unmap Error', ['error' => $e->getMessage()]);
+        return response()->json(['message' => 'Internal Server Error', 'error' => $e->getMessage()], 500);
+    }
+}
 
 
     /**

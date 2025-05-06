@@ -65,6 +65,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/product/graph', [ProductController::class, 'graph']);
     Route::post('/product/quarter', [ProductController::class, 'quarter']);
     Route::post('/product/mapped', [ProductController::class, 'mapped']);
+    Route::post('/product/unmapped', [ProductController::class, 'unmappedSingle']);
     Route::post('/product/bulk-mapped', [ProductController::class, 'bulkMapped']);
 
     Route::get('/header-options', [PageController::class, 'getHeaderOptions']);
