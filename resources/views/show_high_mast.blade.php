@@ -40,11 +40,11 @@
                 <tr><th>Updated At</th><td>{{ $highmast->updated_at }}</td></tr>
             </table>
 
-            <div class="text-center mt-3">
+            {{-- <div class="text-center mt-3">
                 <a href="{{ route('download.pdf', ['filename' => 'high-mast.pdf']) }}" class="btn btn-success">
                     <i class="fa fa-download"></i> Download PDF
                 </a>
-            </div>
+            </div> --}}
         </div>
     </div>
 
