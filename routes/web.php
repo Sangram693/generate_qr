@@ -37,5 +37,6 @@ Route::get('/download/{filename}', function ($filename) {
     if (file_exists($path)) {
         return response()->download($path);
     }
-    return response()->json(['error' => 'File not found'], 404);
+    \Log::error("Download failed: File not found at $path");
+    return response()->view('errors.file_not_found', ['filename' => $filename], 404);
 })->name('download.pdf');
