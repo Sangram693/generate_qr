@@ -1,254 +1,294 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Beam Details</title>
-
     <!-- Bootstrap for Styling -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-
     <!-- jQuery for AJAX -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
     <link rel="stylesheet" href="{{ asset('css/style.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 
+    <style>
+        /* Chatbot Container */
+        #chatbot-container {
+            position: fixed;
+            right: 24px;
+            bottom: 24px;
+            z-index: 9999;
+            margin-bottom: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+
+        /* Main Chatbot Button */
+        .chatbot-main {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: #fff;
+            border: none;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .chatbot-main:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Chatbot Box Animation */
+        .chatbot-box {
+            position: absolute;
+            bottom: 60px;
+            right: 50px;
+            /* Adjusted to align the box's right side with the FAB's left side */
+            width: 320px;
+            /* Increased width for a standard chatbot size */
+            height: 400px;
+            /* Added height for a standard chatbot size */
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            padding: 16px;
+            visibility: hidden;
+            opacity: 0;
+            transform: scale(0.5) translateY(20px) translateX(20px);
+            transform-origin: bottom right;
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease-in-out, visibility 0.4s;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            /* Increased spacing between buttons */
+        }
+
+        #chatbot-container.open .chatbot-box {
+            visibility: visible;
+            opacity: 1;
+            transform: scale(1) translateY(0) translateX(0);
+        }
+
+        /* Main Chatbot Button Animation */
+        /* #chatbot-container.open .chatbot-main {
+            transform: rotate(45deg);
+        } */
+
+        /* Chatbot Action Buttons */
+        .chatbot-action {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #f8f9fa;
+            color: #007bff;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 16px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.3s, color 0.3s;
+            text-align: left;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .chatbot-action i {
+            font-size: 1.2rem;
+        }
+
+        .chatbot-action:hover {
+            background: #007bff;
+            color: #fff;
+        }
+
+        /* Fade-in Animation */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .chatbot-header {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 16px;
+        }
+
+        .help-icon {
+            font-size: 1.5rem;
+            color: #007bff;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .help-icon:hover {
+            color: #0056b3;
+        }
+    </style>
 </head>
+
 <body>
-    @if(!empty($beam->batch_no))
-    <div class="row justify-content-center">
-        <div class="col-md-5">
-            <div class="message-box _success">
-                <i class="fa fa-check-circle"></i>
-                <h2>Utkarsh Product Verified</h2>
+    @if (!empty($beam->batch_no))
+        <div class="row justify-content-center">
+            <div class="col-md-5">
+                <div class="message-box _success">
+                    <i class="fa fa-check-circle"></i>
+                    <h2>Utkarsh Product Verified</h2>
+                </div>
             </div>
         </div>
-    </div>
     @endif
     <div class="container mt-5">
         <h2 class="text-center">Beam Details</h2>
-        
+
         <div class="card p-4 shadow-lg">
             <table class="table table-bordered">
-                <tr><th>Serial Number</th><td>{{ $beam->id }}</td></tr>
-                <tr><th>Grade of Steel</th><td>{{ $beam->grade ?? 'N/A' }}</td></tr>
-                <tr><th>Batch Number</th><td>{{ $beam->batch_no ?? 'N/A' }}</td></tr>
-                <tr><th>Origin</th><td>{{ $beam->origin ?? 'N/A' }}</td></tr>
-                <tr><th>Asp</th><td>{{ $beam->asp ?? 'N/A' }}</td></tr>
-                <tr><th>Created At</th><td>{{ $beam->created_at }}</td></tr>
-                <tr><th>Updated At</th><td>{{ $beam->updated_at }}</td></tr>
+                <tr>
+                    <th>Serial Number</th>
+                    <td>{{ $beam->id }}</td>
+                </tr>
+                <tr>
+                    <th>Grade of Steel</th>
+                    <td>{{ $beam->grade ?? 'N/A' }}</td>
+                </tr>
+                <tr>
+                    <th>Batch Number</th>
+                    <td>{{ $beam->batch_no ?? 'N/A' }}</td>
+                </tr>
+                <tr>
+                    <th>Origin</th>
+                    <td>{{ $beam->origin ?? 'N/A' }}</td>
+                </tr>
+                <tr>
+                    <th>Asp</th>
+                    <td>{{ $beam->asp ?? 'N/A' }}</td>
+                </tr>
+                <tr>
+                    <th>Created At</th>
+                    <td>{{ $beam->created_at }}</td>
+                </tr>
+                <tr>
+                    <th>Updated At</th>
+                    <td>{{ $beam->updated_at }}</td>
+                </tr>
             </table>
 
             <div class="text-center mt-3">
                 <a href="{{ route('download.pdf', ['filename' => 'w-beam' . '.pdf']) }}" class="btn btn-success">
                     <i class="fa fa-download"></i> Download PDF
                 </a>
-                
-        </div>
 
-    </div>
-
-    <!-- SOS Button -->
-    <div id="sos-container" style="position: fixed; right: 24px; bottom: 140px; z-index: 10000;">
-        <button id="sos-button" class="btn btn-danger d-flex align-items-center justify-content-center" style="border-radius: 50%; width: 60px; height: 60px; font-size: 1.5rem;">
-            SOS
-        </button>
-    </div>
-
-    <!-- Chatbot Floating Action Button -->
-    <div id="chatbot-container">
-        <button id="chatbot-main" class="chatbot-main">
-            <i class="fa fa-comments"></i>
-        </button>
-        <div id="chatbot-box" class="chatbot-box">
-            <div class="chatbot-header">
-                <i class="fa fa-question-circle help-icon" title="Help"></i>
             </div>
-            <button class="chatbot-action" data-url="https://www.google.com/maps/search/nearby+hospital/" title="Nearby Hospital">
-                <span>Hospital</span>
-            </button>
-            <button class="chatbot-action" data-url="https://www.google.com/maps/search/nearby+police+station/" title="Nearby Police Station">
-                <span>Police Station</span>
-            </button>
-            <button class="chatbot-action" data-url="https://www.google.com/maps/search/nearby+petrol+pump/" title="Nearby Petrol Pump">
-                <span>Petrol Pump</span>
+
+        </div>
+
+        <!-- SOS Button -->
+        <div id="sos-container" style="position: fixed; right: 24px; bottom: 140px; z-index: 10000;">
+            <button id="sos-button" class="btn btn-danger d-flex align-items-center justify-content-center"
+                style="border-radius: 50%; width: 60px; height: 60px; font-size: 1.5rem;">
+                SOS
             </button>
         </div>
-    </div>
-    <style>
-    /* Chatbot Container */
-    #chatbot-container {
-        position: fixed;
-        right: 24px;
-        bottom: 24px;
-        z-index: 9999;
-        margin-bottom: 40px;
-        display: flex;
-        flex-direction: column;
-        align-items: flex-end;
-    }
 
-    /* Main Chatbot Button */
-    .chatbot-main {
-        width: 60px;
-        height: 60px;
-        border-radius: 50%;
-        background: linear-gradient(135deg, #007bff, #0056b3);
-        color: #fff;
-        border: none;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-        font-size: 1.5rem;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        transition: transform 0.3s, box-shadow 0.3s;
-    }
+        <!-- Chatbot Floating Action Button -->
+        <div id="chatbot-container">
+            <button id="chatbot-main" class="chatbot-main">
+                {{-- <i class="fa fa-comments"></i> --}}
+                Help
+            </button>
+            <div id="chatbot-box" class="chatbot-box">
+                <div class="chatbot-header">
+                    <i class="fa fa-question-circle help-icon" title="Help"></i>
+                </div>
+                <button class="chatbot-action" data-url="https://www.google.com/maps/search/nearby+hospital/"
+                    title="Nearby Hospital">
+                    <span>Hospital</span>
+                </button>
+                <button class="chatbot-action" data-url="https://www.google.com/maps/search/nearby+police+station/"
+                    title="Nearby Police Station">
+                    <span>Police Station</span>
+                </button>
+                <button class="chatbot-action" data-url="https://www.google.com/maps/search/nearby+petrol+pump/"
+                    title="Nearby Petrol Pump">
+                    <span>Petrol Pump</span>
+                </button>
+            </div>
+        </div>
 
-    .chatbot-main:hover {
-        transform: scale(1.1);
-        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
-    }
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                var chatbotMain = document.getElementById('chatbot-main');
+                var chatbotContainer = document.getElementById('chatbot-container');
+                var chatbotBox = document.getElementById('chatbot-box');
+                var chatbotIcon = chatbotMain.querySelector('i');
 
-    /* Chatbot Box Animation */
-    .chatbot-box {
-        position: absolute;
-        bottom: 60px;
-        right: 50px; /* Adjusted to align the box's right side with the FAB's left side */
-        width: 320px; /* Increased width for a standard chatbot size */
-        height: 400px; /* Added height for a standard chatbot size */
-        background: #fff;
-        border-radius: 12px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        padding: 16px;
-        visibility: hidden;
-        opacity: 0;
-        transform: scale(0.5) translateY(20px) translateX(20px);
-        transform-origin: bottom right;
-        transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease-in-out, visibility 0.4s;
-        display: flex;
-        flex-direction: column;
-        gap: 16px; /* Increased spacing between buttons */
-    }
+                // Toggle chatbot box
+                chatbotMain.addEventListener('click', function(e) {
+                    e.stopPropagation(); // Prevent this click from bubbling up to document
+                    chatbotContainer.classList.toggle('open');
 
-    #chatbot-container.open .chatbot-box {
-        visibility: visible;
-        opacity: 1;
-        transform: scale(1) translateY(0) translateX(0);
-    }
+                    // Hide SOS button when chatbot is open
+                    var sosContainer = document.getElementById('sos-container');
+                    if (chatbotContainer.classList.contains('open')) {
+                        sosContainer.style.display = 'none';
+                        chatbotIcon.classList.remove('fa-comments');
+                        chatbotIcon.classList.add('fa-times');
+                    } else {
+                        sosContainer.style.display = 'block';
+                        chatbotIcon.classList.remove('fa-times');
+                        chatbotIcon.classList.add('fa-comments');
+                    }
+                });
 
-    /* Main Chatbot Button Animation */
-    #chatbot-container.open .chatbot-main {
-        transform: rotate(45deg);
-    }
+                // Prevent clicks inside the chatbot box from closing it
+                chatbotBox.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                });
 
-    /* Chatbot Action Buttons */
-    .chatbot-action {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        background: #f8f9fa;
-        color: #007bff;
-        border: none;
-        border-radius: 8px;
-        padding: 10px 16px;
-        font-size: 1rem;
-        cursor: pointer;
-        transition: background 0.3s, color 0.3s;
-        text-align: left;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    }
+                // Close chatbot when clicking anywhere else on the document
+                document.addEventListener('click', function() {
+                    if (chatbotContainer.classList.contains('open')) {
+                        chatbotContainer.classList.remove('open');
+                        document.getElementById('sos-container').style.display = 'block';
+                        chatbotIcon.classList.remove('fa-times');
+                        chatbotIcon.classList.add('fa-comments');
+                    }
+                });
 
-    .chatbot-action i {
-        font-size: 1.2rem;
-    }
+                // Handle chatbot action clicks
+                var chatbotActions = document.querySelectorAll('.chatbot-action');
+                chatbotActions.forEach(function(action) {
+                    action.addEventListener('click', function() {
+                        var url = this.getAttribute('data-url');
+                        window.open(url, '_blank'); // Open the link programmatically
+                    });
+                });
 
-    .chatbot-action:hover {
-        background: #007bff;
-        color: #fff;
-    }
-
-    /* Fade-in Animation */
-    @keyframes fadeIn {
-        from {
-            opacity: 0;
-            transform: translateY(10px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-
-    .chatbot-header {
-        display: flex;
-        justify-content: flex-start;
-        align-items: center;
-        padding-bottom: 8px;
-        border-bottom: 1px solid #ddd;
-        margin-bottom: 16px;
-    }
-
-    .help-icon {
-        font-size: 1.5rem;
-        color: #007bff;
-        cursor: pointer;
-        transition: color 0.3s;
-    }
-
-    .help-icon:hover {
-        color: #0056b3;
-    }
-    </style>
-    <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        var chatbotMain = document.getElementById('chatbot-main');
-        var chatbotContainer = document.getElementById('chatbot-container');
-        var chatbotIcon = chatbotMain.querySelector('i');
-
-        // Toggle chatbot box
-        chatbotMain.addEventListener('click', function() {
-            chatbotContainer.classList.toggle('open');
-
-            // Hide SOS button when chatbot is open
-            var sosContainer = document.getElementById('sos-container');
-            if (chatbotContainer.classList.contains('open')) {
-                sosContainer.style.display = 'none';
-                chatbotIcon.classList.remove('fa-comments');
-                chatbotIcon.classList.add('fa-times');
-            } else {
-                sosContainer.style.display = 'block';
-                chatbotIcon.classList.remove('fa-times');
-                chatbotIcon.classList.add('fa-comments');
-            }
-        });
-
-        // Prevent rotation of the chatbot button when toggling
-        chatbotMain.style.transform = chatbotContainer.classList.contains('open') ? 'none' : 'none';
-
-        // Handle chatbot action clicks
-        var chatbotActions = document.querySelectorAll('.chatbot-action');
-        chatbotActions.forEach(function(action) {
-            action.addEventListener('click', function() {
-                var url = this.getAttribute('data-url');
-                window.open(url, '_blank'); // Open the link programmatically
+                // SOS button functionality
+                var sosButton = document.getElementById('sos-button');
+                sosButton.addEventListener('click', function() {
+                    alert('SOS button clicked!');
+                });
             });
-        });
-
-        // SOS button functionality
-        var sosButton = document.getElementById('sos-button');
-
-        sosButton.addEventListener('click', function() {
-            alert('SOS button clicked!');
-
-            // Hide chatbot when SOS button is clicked
-            chatbotContainer.classList.remove('open');
-            chatbotIcon.classList.remove('fa-times');
-            chatbotIcon.classList.add('fa-comments');
-        });
-    });
-    </script>
-    <!-- End Chatbot Floating Action Button -->
+        </script>
+        <!-- End Chatbot Floating Action Button -->
 </body>
+
 </html>
