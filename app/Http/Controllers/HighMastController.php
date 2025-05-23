@@ -113,7 +113,7 @@ class HighMastController extends Controller
 
         // $this->trackView('highmast', $id, $request);
 
-        return view('show_high_mast', ['highmast' => $highMast]);
+        return view('show_high_mast', ['highmast' => $highmast]);
     }
 
     private function trackView($productType, $productId, Request $request)
