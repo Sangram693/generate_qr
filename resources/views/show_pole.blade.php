@@ -53,7 +53,7 @@
     <!-- Chatbot Floating Action Button -->
     <div id="chatbot-container">
         <button id="chatbot-main" class="chatbot-main">
-            <i class="fa fa-comments"></i>
+            Help
         </button>
         <div id="chatbot-box" class="chatbot-box">
             <div class="chatbot-header">
