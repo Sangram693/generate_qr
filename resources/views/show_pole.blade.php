@@ -39,7 +39,11 @@
                 <tr><th>Updated At</th><td>{{ $pole->updated_at }}</td></tr>
             </table>
 
-            
+            <div class="text-center mt-3">
+                <a href="#" class="btn btn-success disabled" tabindex="-1" aria-disabled="true" style="pointer-events: none; opacity: 0.6;">
+                    <i class="fa fa-download"></i> Download PDF
+                </a>
+            </div>
         </div>
     </div>
 
