@@ -41,7 +41,7 @@
             </table>
 
             <div class="text-center mt-3">
-                <a href="#" class="btn btn-success disabled" tabindex="-1" aria-disabled="true" style="pointer-events: none; opacity: 0.6;">
+                <a href="{{ route('download.pdf', ['filename' => 'high-mast.pdf']) }}" class="btn btn-success">
                     <i class="fa fa-download"></i> Download PDF
                 </a>
             </div>
