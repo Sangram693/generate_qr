@@ -229,6 +229,14 @@
                     title="Nearby Petrol Pump">
                     <span>Petrol Pump</span>
                 </button>
+                <button class="chatbot-action" data-url="https://www.google.com/maps/search/nearby+mechanic+shop/"
+                    title="Nearby Petrol Pump">
+                    <span>Mechanic Shop</span>
+                </button>
+                <button class="chatbot-action" data-url="https://www.google.com/maps/search/nearby+rail+station/"
+                    title="Nearby Petrol Pump">
+                    <span>Rail Station</span>
+                </button>
             </div>
         </div>
 
