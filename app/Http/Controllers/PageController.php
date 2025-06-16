@@ -191,15 +191,15 @@ class PageController extends Controller
             if (!file_exists($tempFile)) {
                 return response()->json(['error' => "QR Code $count file not created"], 500);
             }
-
-            $total_border_height = $qr_height + 13; 
+            $logo_height = $qr_height / 22 * 8; 
+            $total_border_height = $qr_height + 5 + $logo_height; 
             $pdf->SetAlpha(1);
             $pdf->SetFillColor(255, 255, 255); 
     $pdf->Rect($x - 1, $y - 1, $qr_width + 4, $total_border_height + 0.7, 'F');
             
 $pdf->SetDrawColor($r, $g, $b); 
 $pdf->SetLineWidth(1); 
-$logo_height = $qr_height / 22 * 8; 
+
 $padding = 1; 
 
 $pdf->Rect($x - 1, $y - 1, $qr_width + 4, $total_border_height + 0.7, 'D'); 
