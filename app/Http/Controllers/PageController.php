@@ -216,7 +216,7 @@ $pdf->Line($x -1, $line_y, $x + $qr_width + 3, $line_y);
 
 $svgContent = file_get_contents($logoPath);
 $logo_width = $qr_width;
-$logo_x = $x + 1 +($qr_width - $logo_width) / 2; 
+$logo_x = $x + 1;
 $logo_y = $qr_y + $qr_height + $padding +2; 
 $pdf->Image(public_path('ut logo up.png'), $logo_x, $logo_y, $logo_width, $logo_height);
 
@@ -225,7 +225,7 @@ $pdf->Image(public_path('ut logo up.png'), $logo_x, $logo_y, $logo_width, $logo_
     $text_width = $pdf->GetStringWidth($text); // Measure text width
 
     // Example: center-align based on logo position
-    $text_x = $logo_x + ($logo_width) - ($text_width); // Right the text
+    $text_x = $logo_x + ($logo_width) - ($text_width) - 5; // Right the text
     $text_y = $logo_y - $padding * 4;
 
     $pdf->SetTextColor(0, 0, 0);
