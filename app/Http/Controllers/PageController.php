@@ -220,11 +220,16 @@ $logo_x = $x + 1 +($qr_width - $logo_width) / 2;
 $logo_y = $qr_y + $qr_height + $padding +2; 
 $pdf->Image(public_path('ut logo up.png'), $logo_x, $logo_y, $logo_width, $logo_height);
 
-$pdf->SetFont('helvetica', 'B', 5); // Set Font (Bold)
-    $pdf->SetTextColor(0, 0, 0); // Set Black Color
-    $text_x = $logo_x + ($logo_width / 5); // Adjust text position to center
-    $text_y = $logo_y-$padding*4; // Adjust text slightly above the center
-    $pdf->Text($text_x, $text_y, $product->id); // Print Product ID
+    $pdf->SetFont('helvetica', 'B', 5); // Set font before measuring
+    $text = $product->id;
+    $text_width = $pdf->GetStringWidth($text); // Measure text width
+
+    // Example: center-align based on logo position
+    $text_x = $logo_x + ($logo_width) - ($text_width); // Right the text
+    $text_y = $logo_y - $padding * 4;
+
+    $pdf->SetTextColor(0, 0, 0);
+    $pdf->Text($text_x, $text_y, $text);
 
 
         
