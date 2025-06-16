@@ -225,7 +225,7 @@ $pdf->Image(public_path('ut logo up.png'), $logo_x, $logo_y, $logo_width, $logo_
     $text_width = $pdf->GetStringWidth($text); // Measure text width
 
     // Example: center-align based on logo position
-    $text_x = $logo_x + ($logo_width) - ($text_width) - 5; // Right the text
+    $text_x = $logo_x + ($logo_width) - ($text_width) -1; // Right the text
     $text_y = $logo_y - $padding * 4;
 
     $pdf->SetTextColor(0, 0, 0);
