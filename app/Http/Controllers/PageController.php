@@ -199,7 +199,7 @@ class PageController extends Controller
             
 $pdf->SetDrawColor($r, $g, $b); 
 $pdf->SetLineWidth(1); 
-$logo_height = 8; 
+$logo_height = $qr_height / 22 * 8; 
 $padding = 1; 
 
 $pdf->Rect($x - 1, $y - 1, $qr_width + 4, $total_border_height + 0.7, 'D'); 
