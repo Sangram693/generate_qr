@@ -129,7 +129,7 @@ class PageController extends Controller
         $margin_bottom = $request->margin_bottom;
         $margin_left = $request->margin_left;
         $margin_right = $request->margin_right;
-
+         $logo_height = $qr_height / 22 * 8; 
         
         $pdf = new TCPDF('P', 'mm', [$page_width, $page_height], true, 'UTF-8', false);
         $pdf->setPrintHeader(false);
@@ -149,7 +149,7 @@ class PageController extends Controller
         $border_width = 1;
         $qr_spacing = $margin_left;
         $qr_total_width = $qr_width + $border_width + $qr_spacing;
-        $qr_total_height = $qr_height + $border_width + 11 + $qr_spacing;
+        $qr_total_height = $qr_height + $border_width + 3 +$logo_height + $qr_spacing;
         
         $columns = (int) (($page_width) / ($qr_total_width + $margin_left));
         $rows = (int) (($page_height) / ($qr_total_height  + $margin_top));
@@ -191,7 +191,7 @@ class PageController extends Controller
             if (!file_exists($tempFile)) {
                 return response()->json(['error' => "QR Code $count file not created"], 500);
             }
-            $logo_height = $qr_height / 22 * 8; 
+           
             $total_border_height = $qr_height + 5 + $logo_height; 
             $pdf->SetAlpha(1);
             $pdf->SetFillColor(255, 255, 255); 
