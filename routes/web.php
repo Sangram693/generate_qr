@@ -1,20 +1,27 @@
 <?php
 
+use App\Http\Controllers\ReportController;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\PageController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/generate', function () {
-    return view('welcome');
+// Custom login route
+Route::get('/sangram/roygupta/{id}/sneider/{name}', [AuthController::class, 'showLoginForm'])->name('custom.login');
+Route::post('/login', [AuthController::class, 'login'])->name('login');
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+// Protected routes
+Route::middleware('auth.redirect')->group(function () {
+    Route::get('/generate', function () {
+        return view('welcome');
+    })->name('generate');
+
+    Route::post('/pages', [PageController::class, 'store'])->name('pages.store');
+    Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
+    Route::post('/reports/bulk-update', [ReportController::class, 'bulkUpdate'])->name('reports.bulk-update');
 });
 
-
-
-
-Route::get('/sangram/roygupta/{id}/sneider/{name}', function($id, $name){
-    if($id == 143 && $name == 'qr'){
-        return view('login');
-    }
-});
-
+// Public download routes
 Route::get('/download/excel/{file}', function ($file) {
     $path = storage_path("app/public/excel_files/$file");
     if (file_exists($path)) {
@@ -23,7 +30,7 @@ Route::get('/download/excel/{file}', function ($file) {
     return response()->json(['error' => 'File not found'], 404);
 });
 
-Route::get('/download/pdf/{file}', function ($file) {
+Route::match(['get', 'post'], '/download/pdf/{file}', function ($file) {
     $path = storage_path("app/public/pdf_files/$file");
     if (file_exists($path)) {
         return response()->download($path)->deleteFileAfterSend(true);

@@ -32,6 +32,7 @@ class StorePageRequest extends FormRequest
             'qr_height' => 'required|string',
             'qr_width' => 'required|string',
             'row_number' => 'required|integer',
+            'product_type' => 'required|in:w-beam,pole,high-mast',
         ];
     }
 
@@ -54,6 +55,8 @@ class StorePageRequest extends FormRequest
             'qr_width.required' => 'QR width is required',
             'row_number.required' => 'Row number is required',
             'row_number.integer' => 'Row number must be an integer',
+            'product_type.required' => 'Product type is required',
+            'product_type.in' => 'Product type must be one of the following: w-beam, pole, high-mast',
         ];
     }
 }

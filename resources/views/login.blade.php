@@ -4,150 +4,154 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>Login Page</title>
+    <title>Login - QR Generator</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
     <!-- Styles -->
     <style>
         body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f8f9fa;
             margin: 0;
-            background-color: #f3f4f6;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
 
-        .container {
-            max-width: 400px;
-            padding: 20px;
-            border: 1px solid #ddd;
-            border-radius: 10px;
-            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
-            background: #fff;
+        .navbar {
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
-        h1 {
-            color: #333;
-            margin-bottom: 20px;
-            text-align: center;
+        .navbar-brand img {
+            height: 40px;
+            margin-right: 10px;
         }
 
-        label {
-            font-weight: 600;
-            margin-top: 10px;
+        .main-content {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
         }
 
-        input,
-        button {
+        .login-card {
             width: 100%;
-            padding: 10px;
-            margin-top: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-
-        button {
-            background-color: #3490dc;
-            color: white;
+            max-width: 400px;
             border: none;
-            cursor: pointer;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            border-radius: 15px;
+            overflow: hidden;
         }
 
-        button:hover {
-            background-color: #2779bd;
+        .card-header {
+            background-color: #4f46e5;
+            color: white;
+            padding: 1.5rem;
+            text-align: center;
+            border-bottom: none;
+        }
+
+        .form-control, .form-select {
+            border-radius: 8px;
+            padding: 0.4rem 0.75rem;
+            border: 1px solid #e5e7eb;
+            height: calc(1.8em + 0.8rem);
+        }
+
+        .form-control:focus {
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 0.2rem rgba(79, 70, 229, 0.25);
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 0.3rem;
+        }
+
+        .mb-3 {
+            margin-bottom: 0.8rem !important;
+        }
+
+        .btn-primary {
+            background-color: #4f46e5;
+            border: none;
+            padding: 0.4rem 1rem;
+        }
+
+        .btn-primary:hover {
+            background-color: #4338ca;
         }
 
         .error {
-            color: red;
-            margin-top: 10px;
-            text-align: center;
+            color: #dc2626;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
         }
 
-        .success {
-            color: green;
-            margin-top: 10px;
-            text-align: center;
+        .card-body {
+            padding: 1.5rem !important;
         }
     </style>
 </head>
 
 <body>
-    <div class="container">
-        <h1>Login</h1>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <img src="{{ url('UT LOGO.png') }}" alt="UT Logo">
+                QR Generator
+            </a>
+        </div>
+    </nav>
 
-        <form id="loginForm">
-            @csrf
-            <label for="email">User Name</label>
-            <input type="text" id="email" name="email" placeholder="Enter your user name" required 
-                style="width: 100%; margin: 5px 0; padding: 10px; box-sizing: border-box;">
-        
-            <label for="password">Password</label>
-            <div style="position: relative; width: 100%; margin: 5px 0; box-sizing: border-box;">
-                <input type="password" id="password" name="password" placeholder="Enter your password" required 
-                    style="width: 100%; padding: 10px; padding-right: 40px; box-sizing: border-box;">
-                <a href="#" onclick="togglePassword()" 
-                    style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer; text-decoration: none">
-                    👁️
-                </a>
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="login-card card">
+            <div class="card-header">
+                <h4 class="mb-0">Login to QR Generator</h4>
             </div>
-        
-            <button type="button" onclick="submitLogin()" style="width: 100%; padding: 10px; margin-top: 10px;">Login</button>
-        </form>
+            <div class="card-body">
+                @if ($errors->any())
+                    <div class="alert alert-danger py-2 mb-3">
+                        {{ $errors->first() }}
+                    </div>
+                @endif
 
-        <p id="responseMessage" class="error"></p>
+                <form method="POST" action="{{ route('login') }}">
+                    @csrf
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email Address</label>
+                        <input type="email" class="form-control form-control-sm" id="email" name="email" 
+                            value="{{ old('email') }}" required autofocus>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Password</label>
+                        <input type="password" class="form-control form-control-sm" id="password" 
+                            name="password" required>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-sign-in-alt me-2"></i> Login
+                    </button>
+                </form>
+            </div>
+        </div>
     </div>
 
-    <!-- JavaScript for form submission and token handling -->
-    <script>
-        function togglePassword() {
-            let passwordField = document.getElementById("password");
-            if (passwordField.type === "password") {
-                passwordField.type = "text";
-            } else {
-                passwordField.type = "password";
-            }
-        }
-
-        function submitLogin() {
-            const email = document.getElementById("email").value;
-            const password = document.getElementById("password").value;
-            const responseMessage = document.getElementById("responseMessage");
-
-            fetch("{{ url('/api/login') }}", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                        user_name: email,
-                        password: password,
-                    }),
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.token) {
-                        // Store the token dynamically
-                        localStorage.setItem("authToken", data.token);
-                        responseMessage.className = "success";
-                        responseMessage.innerText = "Login successful!";
-
-                        // Redirect to the QR Code generation page
-                        setTimeout(() => {
-                            window.location.href = "{{ url('/generate') }}";
-                        }, 1000);
-                    } else {
-                        responseMessage.className = "error";
-                        responseMessage.innerText = "Invalid email or password.";
-                    }
-                })
-                .catch(error => {
-                    responseMessage.className = "error";
-                    responseMessage.innerText = "Error: " + error.message;
-                });
-        }
-    </script>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>

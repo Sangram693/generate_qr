@@ -21,11 +21,17 @@ class Page extends Model
         'excel_file',
         'user_id',
         'product',
-        'total_rows'
+        'total_rows',
+        'status'
     ];
 
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function reports()
+    {
+        return $this->hasMany(Report::class);
     }
 }

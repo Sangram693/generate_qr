@@ -6,6 +6,7 @@ use TCPDF;
 use App\Models\Beam;
 use App\Models\Page;
 use App\Models\Pole;
+use App\Models\Report;
 use App\Models\HighMast;
 use Illuminate\Http\Request;
 use App\Http\Requests\StorePageRequest;
@@ -29,19 +30,13 @@ class PageController extends Controller
     {
         $user = auth()->user();
         $request->merge(['user_id' => $user->id]);
-
-        $request->validated([
-            'product_type' => 'required|in:w-beam, pole, high-mast'
-        ]);
+        
         $date = Carbon::now()->format('d-m-Y');
-
         $rowNumber = $request->row_number;
-
 
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
         $sheet->setTitle('Random Data');
-
 
         $sheet->setCellValue('A1', 'serial_no');
         $sheet->setCellValue('B1', 'grade');
@@ -52,12 +47,14 @@ class PageController extends Controller
             'w-beam' => Beam::class,
             'pole' => Pole::class,
             'high-mast' => HighMast::class,
+            default => throw new \Exception('Invalid product type')
         };
 
         $baseUrl = match ($request->product_type) {
             'w-beam' => 'http://verify.utkarshsmart.in/api/w-beam/',
             'pole' => 'http://verify.utkarshsmart.in/api/pole/',
             'high-mast' => 'http://verify.utkarshsmart.in/api/high-mast/',
+            default => throw new \Exception('Invalid product type')
         };
 
         [$r, $g, $b] = match ($request->product_type) {
@@ -109,6 +106,14 @@ class PageController extends Controller
             'user_id' => $request->user_id,
             'product' => $request->product_type,
             'total_rows' => $rowNumber + 1,
+        ]);
+
+         Report::create([
+            'product_name' => $request->product_type,
+            'qty' => $rowNumber,
+            'generation_date' => $date,
+            'delivery_date' => null,
+            'page_id' => $page->id,
         ]);
 
 
@@ -297,6 +302,7 @@ class PageController extends Controller
     public function getHeaderOptions()
     {
         $pages = Page::where('isMapped', false)
+            -where('status', true)
             ->orderBy('id', 'desc')
             ->get()
             ->map(function ($page) {
