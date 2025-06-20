@@ -615,7 +615,7 @@ public function bulkMapped(Request $request)
             return response()->json(['message' => 'Invalid range for start_index and total_scan'], 400);
         }
 
-        if($totalScan > $totalRows - $startIndex +1) {
+        if($totalScan > ($totalRows - $startIndex +1)) {
             return response()->json(['message' => 'Total scan exceeds remaining QR'], 400);
         }
 
