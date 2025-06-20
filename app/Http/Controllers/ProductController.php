@@ -611,6 +611,14 @@ public function bulkMapped(Request $request)
         $totalRows = $page->total_rows;
         $endIndex = min($startIndex + $totalScan - 1, $totalRows); // Do not exceed total rows
 
+        if ($endIndex < $startIndex) {
+            return response()->json(['message' => 'Invalid range for start_index and total_scan'], 400);
+        }
+
+        if($totalScan > $totalRows - $startIndex +1) {
+            return response()->json(['message' => 'Total scan exceeds remaining QR'], 400);
+        }
+
         $filePath = str_replace('storage/', '', $page->excel_file);
         $storagePath = public_path("storage/{$filePath}");
         
