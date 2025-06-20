@@ -586,9 +586,9 @@ public function bulkMapped(Request $request)
         return response()->json(['message' => 'Batch number is required'], 400);
     }
 
-    if ($batchNo.length > 50) {
-        return response()->json(['message' => 'Batch number must be within 50 characters long'], 400);
-    }
+    if (strlen($batchNo) > 50) {
+    return response()->json(['message' => 'Batch number must be within 50 characters long'], 400);
+}
 
     $headerId = $request->input('header_id');
     if (!$headerId) {
