@@ -302,7 +302,7 @@ class PageController extends Controller
     public function getHeaderOptions()
     {
         $pages = Page::where('isMapped', false)
-            -where('status', true)
+            ->where('status', true)
             ->orderBy('id', 'desc')
             ->get()
             ->map(function ($page) {
