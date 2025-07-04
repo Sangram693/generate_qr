@@ -37,13 +37,18 @@ Route::match(['get', 'post'], '/download/pdf/{file}', function ($file) {
     }
     return response()->json(['error' => 'File not found'], 404);
 });
-
 Route::get('/download/{filename}', function ($filename) {
     $path = public_path("download/$filename");
 
     if (file_exists($path)) {
-        return response()->download($path);
+        return response()->file($path, [
+            'Content-Disposition' => 'inline; filename="'.$filename.'"',
+            'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
+            'Pragma' => 'no-cache',
+            'Expires' => '0'
+        ]);
     }
+
     \Log::error("Download failed: File not found at $path");
     return response()->view('errors.file_not_found', ['filename' => $filename], 404);
 })->name('download.pdf');
